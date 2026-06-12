@@ -17,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: 'Paper Plane',
-  description: 'Send anonymous questions as paper planes — Modern ZEN x Bangkok',
+  title: 'TAYAN',
+  description: 'Send anonymous messages as flights — real-time interactive airport dashboard',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

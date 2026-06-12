@@ -210,6 +210,8 @@ export default function LandingPage() {
   const [code, setCode] = useState('');
   const router = useRouter();
   const { userId } = useUserStore();
+  const { theme } = useTheme();
+  const isNight = theme === 'night';
 
   const handleJoin = () => {
     if (code.length === 6) router.push(`/room/${code.toUpperCase()}`);
@@ -237,7 +239,7 @@ export default function LandingPage() {
         </motion.div>
 
         <h1 className="heading text-4xl font-bold mb-2 text-white drop-shadow-md">
-          Paper Plane
+          TAYAN
         </h1>
         <p className="text-sm mb-10 text-white/80">
           Your thoughts take flight
@@ -272,6 +274,11 @@ export default function LandingPage() {
           Organizer?{' '}
           <button onClick={() => router.push(userId ? '/dashboard' : '/login')} className="font-semibold underline underline-offset-2 text-white">
             {userId ? 'Dashboard' : 'Login'}
+          </button>
+        </p>
+        <p className="mt-3 text-xs" style={{ color: isNight ? '#4a6080' : 'rgba(255,255,255,0.5)' }}>
+          <button onClick={() => router.push('/contact')} className="underline underline-offset-2 hover:opacity-80 transition-opacity">
+            Contact Developer
           </button>
         </p>
       </motion.div>

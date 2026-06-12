@@ -5,7 +5,7 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
-import { ThemeToggle } from '../../theme-provider';
+import { ThemeToggle, useTheme } from '../../theme-provider';
 
 // --- Types ---
 interface PaperPlane {
@@ -19,14 +19,10 @@ interface PaperPlane {
 
 // --- Constants ---
 const GATES = [
-  { id: 1, x: 10, y: 12 },
-  { id: 2, x: 25, y: 12 },
-  { id: 3, x: 40, y: 12 },
-  { id: 4, x: 55, y: 12 },
-  { id: 5, x: 10, y: 78 },
-  { id: 6, x: 25, y: 78 },
-  { id: 7, x: 40, y: 78 },
-  { id: 8, x: 55, y: 78 },
+  { id: 1, x: 8, y: 14 },{ id: 2, x: 18, y: 14 },{ id: 3, x: 28, y: 14 },{ id: 4, x: 38, y: 14 },
+  { id: 5, x: 48, y: 14 },{ id: 6, x: 58, y: 14 },{ id: 7, x: 68, y: 14 },{ id: 8, x: 78, y: 14 },
+  { id: 9, x: 8, y: 80 },{ id: 10, x: 18, y: 80 },{ id: 11, x: 28, y: 80 },{ id: 12, x: 38, y: 80 },
+  { id: 13, x: 48, y: 80 },{ id: 14, x: 58, y: 80 },{ id: 15, x: 68, y: 80 },{ id: 16, x: 78, y: 80 },
 ];
 
 const COLORS = {
@@ -129,9 +125,13 @@ function PlaneTopDown({ isRead, size = 40 }: { isRead: boolean; size?: number })
 }
 
 // --- Tarmac Layout (Background) ---
-function TarmacLayout() {
+function TarmacLayout({ isNight }: { isNight: boolean }) {
+  const tarmacBg = isNight ? '#1a2530' : '#4a6070';
+  const runwayBg = isNight ? '#152028' : '#3a5060';
+  const gateBuildingBg = isNight ? '#1a3a4a' : '#2a5a6a';
+
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: COLORS.tarmac }}>
+    <div className="absolute inset-0 overflow-hidden" style={{ background: tarmacBg }}>
       {/* Grass border top */}
       <div className="absolute top-0 left-0 right-0 h-[3%]" style={{ background: COLORS.grass, opacity: 0.3 }} />
       {/* Grass border bottom */}
@@ -146,7 +146,7 @@ function TarmacLayout() {
         >
           <div
             className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
-            style={{ background: COLORS.gateBuilding }}
+            style={{ background: gateBuildingBg }}
           >
             G{gate.id}
           </div>
@@ -168,7 +168,7 @@ function TarmacLayout() {
           <div className="w-[2px] h-3 mb-0.5" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
           <div
             className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
-            style={{ background: COLORS.gateBuilding }}
+            style={{ background: gateBuildingBg }}
           >
             G{gate.id}
           </div>
@@ -189,7 +189,7 @@ function TarmacLayout() {
       {/* Runway */}
       <div
         className="absolute left-[5%] right-[5%]"
-        style={{ top: '44%', height: '12%', background: COLORS.runway, borderRadius: '4px' }}
+        style={{ top: '43%', height: '14%', background: runwayBg, borderRadius: '4px' }}
       >
         {/* Center dashes */}
         <div className="absolute top-1/2 left-[3%] right-[3%] flex items-center justify-between -translate-y-1/2">
@@ -212,7 +212,24 @@ function TarmacLayout() {
             <div key={i} className="w-4 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
           ))}
         </div>
+        {/* Runway edge lights */}
+        <div className="absolute left-[2%] right-[2%] top-0 flex justify-between">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={`top-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: isNight ? 0.8 : 0.3 }} />
+          ))}
+        </div>
+        <div className="absolute left-[2%] right-[2%] bottom-0 flex justify-between">
+          {Array.from({ length: 12 }).map((_, i) => (
+            <div key={`bot-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: isNight ? 0.8 : 0.3 }} />
+          ))}
+        </div>
       </div>
+
+      {/* Terminal building */}
+      <div
+        className="absolute left-1/2 bottom-[3%] -translate-x-1/2"
+        style={{ width: '30%', height: '4%', background: '#2a5a6a', borderRadius: '6px 6px 0 0', opacity: 0.4 }}
+      />
 
       {/* Wind sock indicator */}
       <div className="absolute right-[8%] top-[6%] flex items-center gap-1">
@@ -342,6 +359,8 @@ export default function AdminRoomPage() {
   const params = useParams();
   const roomId = params.roomId as string;
   const { userId } = useUserStore();
+  const { theme } = useTheme();
+  const isNight = theme === 'night';
 
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const [gateAssignments, setGateAssignments] = useState<Map<string, number>>(new Map());
@@ -478,7 +497,7 @@ export default function AdminRoomPage() {
   return (
     <div className="h-screen w-screen relative overflow-hidden select-none">
       {/* Tarmac Background */}
-      <TarmacLayout />
+      <TarmacLayout isNight={isNight} />
 
       {/* Theme Toggle */}
       <div className="absolute top-4 right-4 z-30">
@@ -582,7 +601,7 @@ export default function AdminRoomPage() {
                   />
                 )}
                 {/* Plane SVG */}
-                <PlaneTopDown isRead={isRead} size={38} />
+                <PlaneTopDown isRead={isRead} size={48} />
                 {/* Flight label */}
                 <div
                   className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-mono font-bold tracking-wider whitespace-nowrap"
