@@ -17,27 +17,36 @@ interface PaperPlane {
   isPinned?: boolean;
 }
 
-// --- Constants ---
-const GATES = [
-  { id: 1, x: 8, y: 14 },{ id: 2, x: 18, y: 14 },{ id: 3, x: 28, y: 14 },{ id: 4, x: 38, y: 14 },
-  { id: 5, x: 48, y: 14 },{ id: 6, x: 58, y: 14 },{ id: 7, x: 68, y: 14 },{ id: 8, x: 78, y: 14 },
-  { id: 9, x: 8, y: 80 },{ id: 10, x: 18, y: 80 },{ id: 11, x: 28, y: 80 },{ id: 12, x: 38, y: 80 },
-  { id: 13, x: 48, y: 80 },{ id: 14, x: 58, y: 80 },{ id: 15, x: 68, y: 80 },{ id: 16, x: 78, y: 80 },
-];
+interface Gate {
+  id: number;
+  x: number;
+  y: number;
+}
 
-const COLORS = {
-  tarmac: '#4a6070',
-  runway: '#3a5060',
-  runwayMarking: '#ffffff',
-  grass: '#5b9bd5',
-  gateBuilding: '#2a5a6a',
-  planeBody: '#f0ebe0',
-  planeTail: '#4b2d8e',
-  planeAccent: '#c4a44e',
-  unreadGlow: '#e87060',
-  cardBg: 'rgba(255,255,255,0.97)',
-  text: '#1a2a3a',
-};
+// --- Dynamic Gate Generation (Curved Terminal Layout) ---
+function generateGates(capacity: number): Gate[] {
+  const gates: Gate[] = [];
+  const topCount = Math.ceil(capacity / 2);
+  const bottomCount = Math.floor(capacity / 2);
+
+  // Top arc: semicircle from left to right, curving down
+  for (let i = 0; i < topCount; i++) {
+    const t = topCount > 1 ? i / (topCount - 1) : 0.5;
+    const x = 10 + t * 75;
+    const y = 10 + Math.sin(t * Math.PI) * 12;
+    gates.push({ id: i + 1, x, y });
+  }
+
+  // Bottom arc: semicircle from left to right, curving up
+  for (let i = 0; i < bottomCount; i++) {
+    const t = bottomCount > 1 ? i / (bottomCount - 1) : 0.5;
+    const x = 10 + t * 75;
+    const y = 82 - Math.sin(t * Math.PI) * 12;
+    gates.push({ id: topCount + i + 1, x, y });
+  }
+
+  return gates;
+}
 
 // --- SVG Icons ---
 function BackIcon() {
@@ -60,10 +69,10 @@ function CopyIcon() {
 function UsersIcon() {
   return (
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-      <circle cx="9" cy="7" r="4"/>
-      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
+      <path d="M16 3.13a4 4 0 0 1 0 7.75" />
     </svg>
   );
 }
@@ -102,139 +111,321 @@ function CloseIcon() {
   );
 }
 
+function ArrivalIcon() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M2 22h20" />
+      <path d="M3.77 10.77L2 9l2-4.5 1.1.55c.55.28.9.84.9 1.45s.35 1.17.9 1.45L13 11l4-6 1.7.85a2 2 0 0 1 .88 2.6l-5.12 10.24" />
+    </svg>
+  );
+}
+
 // --- Top-Down Plane SVG ---
 function PlaneTopDown({ isRead, size = 40 }: { isRead: boolean; size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
-      {/* Body */}
       <ellipse cx="20" cy="20" rx="4" ry="16" fill={isRead ? '#c8c4bc' : '#f0ebe0'} />
-      {/* Wings */}
       <path d="M20 16 L6 20 L20 22Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
       <path d="M20 16 L34 20 L20 22Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
-      {/* Tail */}
       <path d="M20 34 L16 38 L20 36 L24 38Z" fill={isRead ? '#6a6060' : '#4b2d8e'} />
-      {/* Tail wings */}
       <path d="M20 33 L14 35 L20 34Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
       <path d="M20 33 L26 35 L20 34Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
-      {/* Gold stripe */}
       {!isRead && <line x1="20" y1="6" x2="20" y2="34" stroke="#c4a44e" strokeWidth="0.8" />}
-      {/* Cockpit */}
       <ellipse cx="20" cy="6" rx="2.5" ry="3" fill={isRead ? '#8a8a8a' : '#5b9bd5'} />
     </svg>
   );
 }
 
-// --- Tarmac Layout (Background) ---
-function TarmacLayout({ isNight }: { isNight: boolean }) {
-  const tarmacBg = isNight ? '#1a2530' : '#4a6070';
-  const runwayBg = isNight ? '#152028' : '#3a5060';
-  const gateBuildingBg = isNight ? '#1a3a4a' : '#2a5a6a';
+// --- Terminal Building SVG Paths ---
+function TerminalBuildings({ gates, capacity, isNight }: { gates: Gate[]; capacity: number; isNight: boolean }) {
+  const topCount = Math.ceil(capacity / 2);
+  const topGates = gates.slice(0, topCount);
+  const bottomGates = gates.slice(topCount);
+
+  const buildPath = (gateSet: Gate[], curveDirection: 'down' | 'up') => {
+    if (gateSet.length < 2) return '';
+    const first = gateSet[0];
+    const last = gateSet[gateSet.length - 1];
+    const midX = (first.x + last.x) / 2;
+    const curveAmount = curveDirection === 'down' ? 8 : -8;
+    const midY = ((first.y + last.y) / 2) + curveAmount;
+    return `M ${first.x} ${first.y} Q ${midX} ${midY} ${last.x} ${last.y}`;
+  };
+
+  const topPath = buildPath(topGates, 'down');
+  const bottomPath = buildPath(bottomGates, 'up');
 
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: tarmacBg }}>
-      {/* Grass border top */}
-      <div className="absolute top-0 left-0 right-0 h-[3%]" style={{ background: COLORS.grass, opacity: 0.3 }} />
-      {/* Grass border bottom */}
-      <div className="absolute bottom-0 left-0 right-0 h-[3%]" style={{ background: COLORS.grass, opacity: 0.3 }} />
+    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+      {topPath && (
+        <path
+          d={topPath}
+          fill="none"
+          stroke={isNight ? '#2a4a5a' : '#2a5a6a'}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+      )}
+      {topPath && (
+        <path
+          d={topPath}
+          fill={isNight ? '#1a3040' : '#f5e8c8'}
+          stroke="none"
+          opacity="0.3"
+          strokeWidth="0"
+          transform="translate(0, -3)"
+        />
+      )}
+      {bottomPath && (
+        <path
+          d={bottomPath}
+          fill="none"
+          stroke={isNight ? '#2a4a5a' : '#2a5a6a'}
+          strokeWidth="1.5"
+          opacity="0.6"
+        />
+      )}
+      {bottomPath && (
+        <path
+          d={bottomPath}
+          fill={isNight ? '#1a3040' : '#f5e8c8'}
+          stroke="none"
+          opacity="0.3"
+          strokeWidth="0"
+          transform="translate(0, 3)"
+        />
+      )}
+    </svg>
+  );
+}
 
-      {/* Gate buildings - top row */}
-      {GATES.filter(g => g.y < 50).map(gate => (
-        <div
-          key={`building-${gate.id}`}
-          className="absolute flex flex-col items-center"
-          style={{ left: `${gate.x}%`, top: `${gate.y - 6}%`, transform: 'translateX(-50%)' }}
-        >
-          <div
-            className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
-            style={{ background: gateBuildingBg }}
-          >
-            G{gate.id}
-          </div>
-          {/* T-shaped marking */}
-          <div className="w-[2px] h-3 mt-0.5" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
-          <div className="w-6 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
-        </div>
-      ))}
+// --- Tarmac Layout ---
+function TarmacLayout({ isNight, gates, capacity }: { isNight: boolean; gates: Gate[]; capacity: number }) {
+  const bgColor = isNight ? '#1a2540' : '#5b9bd5';
+  const tarmacColor = isNight ? '#2a3a4a' : '#6b8090';
+  const runwayColor = isNight ? '#1a2a35' : '#5a7080';
+  const gateBadgeColor = isNight ? '#1a3a4a' : '#2a5a6a';
+  const markingOpacity = isNight ? 0.4 : 0.7;
+  const lightOpacity = isNight ? 0.9 : 0.4;
 
-      {/* Gate buildings - bottom row */}
-      {GATES.filter(g => g.y >= 50).map(gate => (
-        <div
-          key={`building-${gate.id}`}
-          className="absolute flex flex-col items-center"
-          style={{ left: `${gate.x}%`, bottom: `${100 - gate.y - 6}%`, transform: 'translateX(-50%)' }}
-        >
-          {/* T-shaped marking (inverted) */}
-          <div className="w-6 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
-          <div className="w-[2px] h-3 mb-0.5" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
-          <div
-            className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
-            style={{ background: gateBuildingBg }}
-          >
-            G{gate.id}
-          </div>
-        </div>
-      ))}
+  const topGates = gates.filter(g => g.y < 50);
+  const bottomGates = gates.filter(g => g.y >= 50);
 
-      {/* Taxiway - top */}
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: bgColor }}>
+      {/* Tarmac surface */}
       <div
-        className="absolute left-[5%] right-[30%] h-[2px]"
-        style={{ top: '35%', background: COLORS.runwayMarking, opacity: 0.2 }}
+        className="absolute"
+        style={{
+          left: '3%', right: '3%', top: '5%', bottom: '5%',
+          background: tarmacColor,
+          borderRadius: '12px',
+        }}
       />
-      {/* Taxiway - bottom */}
+
+      {/* Terminal building SVG curves */}
+      <TerminalBuildings gates={gates} capacity={capacity} isNight={isNight} />
+
+      {/* Gate badges - top arc */}
+      {topGates.map(gate => (
+        <div
+          key={`gate-top-${gate.id}`}
+          className="absolute flex flex-col items-center"
+          style={{ left: `${gate.x}%`, top: `${gate.y - 5}%`, transform: 'translateX(-50%)' }}
+        >
+          <div
+            className="rounded-sm text-[8px] font-bold text-white px-1.5 py-0.5 tracking-wider"
+            style={{ background: gateBadgeColor }}
+          >
+            G{gate.id}
+          </div>
+          <div className="w-[1.5px] h-2 mt-0.5" style={{ background: '#ffffff', opacity: markingOpacity * 0.6 }} />
+        </div>
+      ))}
+
+      {/* Gate badges - bottom arc */}
+      {bottomGates.map(gate => (
+        <div
+          key={`gate-bot-${gate.id}`}
+          className="absolute flex flex-col items-center"
+          style={{ left: `${gate.x}%`, top: `${gate.y + 3}%`, transform: 'translateX(-50%)' }}
+        >
+          <div className="w-[1.5px] h-2 mb-0.5" style={{ background: '#ffffff', opacity: markingOpacity * 0.6 }} />
+          <div
+            className="rounded-sm text-[8px] font-bold text-white px-1.5 py-0.5 tracking-wider"
+            style={{ background: gateBadgeColor }}
+          >
+            G{gate.id}
+          </div>
+        </div>
+      ))}
+
+      {/* Taxiway lines */}
       <div
-        className="absolute left-[5%] right-[30%] h-[2px]"
-        style={{ top: '62%', background: COLORS.runwayMarking, opacity: 0.2 }}
+        className="absolute left-[5%] right-[5%] h-[1px]"
+        style={{ top: '35%', background: '#ffffff', opacity: markingOpacity * 0.3 }}
+      />
+      <div
+        className="absolute left-[5%] right-[5%] h-[1px]"
+        style={{ top: '62%', background: '#ffffff', opacity: markingOpacity * 0.3 }}
       />
 
       {/* Runway */}
       <div
         className="absolute left-[5%] right-[5%]"
-        style={{ top: '43%', height: '14%', background: runwayBg, borderRadius: '4px' }}
+        style={{ top: '43%', height: '14%', background: runwayColor, borderRadius: '4px' }}
       >
         {/* Center dashes */}
         <div className="absolute top-1/2 left-[3%] right-[3%] flex items-center justify-between -translate-y-1/2">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {Array.from({ length: 18 }).map((_, i) => (
             <div
               key={i}
               className="h-[2px] flex-1 mx-1"
-              style={{ background: COLORS.runwayMarking, opacity: 0.7 }}
+              style={{ background: '#ffffff', opacity: markingOpacity }}
             />
           ))}
         </div>
-        {/* Runway threshold markings */}
+        {/* Threshold markings left */}
         <div className="absolute left-[3%] top-[20%] bottom-[20%] flex flex-col justify-between">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-4 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+            <div key={i} className="w-4 h-[2px]" style={{ background: '#ffffff', opacity: markingOpacity * 0.7 }} />
           ))}
         </div>
+        {/* Threshold markings right */}
         <div className="absolute right-[3%] top-[20%] bottom-[20%] flex flex-col justify-between">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="w-4 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+            <div key={i} className="w-4 h-[2px]" style={{ background: '#ffffff', opacity: markingOpacity * 0.7 }} />
           ))}
         </div>
-        {/* Runway edge lights */}
+        {/* Runway edge lights top */}
         <div className="absolute left-[2%] right-[2%] top-0 flex justify-between">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={`top-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: isNight ? 0.8 : 0.3 }} />
+            <div key={`lt-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: lightOpacity }} />
           ))}
         </div>
+        {/* Runway edge lights bottom */}
         <div className="absolute left-[2%] right-[2%] bottom-0 flex justify-between">
           {Array.from({ length: 12 }).map((_, i) => (
-            <div key={`bot-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: isNight ? 0.8 : 0.3 }} />
+            <div key={`lb-${i}`} className="w-2 h-2 rounded-full" style={{ background: '#e8c040', opacity: lightOpacity }} />
           ))}
         </div>
       </div>
 
-      {/* Terminal building */}
-      <div
-        className="absolute left-1/2 bottom-[3%] -translate-x-1/2"
-        style={{ width: '30%', height: '4%', background: '#2a5a6a', borderRadius: '6px 6px 0 0', opacity: 0.4 }}
-      />
-
-      {/* Wind sock indicator */}
-      <div className="absolute right-[8%] top-[6%] flex items-center gap-1">
+      {/* Wind sock */}
+      <div className="absolute right-[6%] top-[7%] flex items-center gap-1">
         <div className="w-[2px] h-5 bg-white opacity-40" />
-        <div className="w-3 h-2 opacity-40" style={{ background: COLORS.unreadGlow, clipPath: 'polygon(0 0, 100% 25%, 100% 75%, 0 100%)' }} />
+        <div className="w-3 h-2 opacity-50" style={{ background: '#e87060', clipPath: 'polygon(0 0, 100% 25%, 100% 75%, 0 100%)' }} />
+      </div>
+    </div>
+  );
+}
+
+// --- Arrivals Board ---
+function ArrivalsBoard({
+  planes,
+  readIds,
+  isNight,
+  onPlaneClick,
+}: {
+  planes: PaperPlane[];
+  readIds: Set<string>;
+  isNight: boolean;
+  onPlaneClick: (plane: PaperPlane) => void;
+}) {
+  const boardBg = isNight ? '#0f1a2a' : '#ffffff';
+  const headerBg = isNight ? '#1a2540' : '#2a5a6a';
+  const rowEven = isNight ? '#141e30' : '#f8fafb';
+  const rowOdd = isNight ? '#0f1a2a' : '#ffffff';
+  const borderColor = isNight ? '#1e2e40' : '#e8edf2';
+  const textColor = isNight ? '#c0d0e0' : '#2a3a4a';
+  const mutedColor = isNight ? '#607080' : '#8090a0';
+
+  const sorted = [...planes].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  );
+
+  return (
+    <div className="h-full flex flex-col overflow-hidden" style={{ background: boardBg }}>
+      {/* Board header */}
+      <div
+        className="flex items-center gap-2 px-4 py-3 shrink-0"
+        style={{ background: headerBg }}
+      >
+        <ArrivalIcon />
+        <span className="text-white text-sm font-semibold tracking-wide">Arrivals</span>
+        <span className="text-white/50 text-xs ml-auto">{planes.length} total</span>
+      </div>
+
+      {/* Column headers */}
+      <div
+        className="grid grid-cols-[60px_1fr_56px_40px] px-4 py-2 text-[10px] font-bold tracking-wider uppercase shrink-0"
+        style={{ color: mutedColor, borderBottom: `1px solid ${borderColor}` }}
+      >
+        <span>Flight</span>
+        <span>From</span>
+        <span>Time</span>
+        <span>Status</span>
+      </div>
+
+      {/* Rows */}
+      <div className="flex-1 overflow-y-auto">
+        <AnimatePresence initial={false}>
+          {sorted.map((plane, idx) => {
+            const isRead = readIds.has(plane.id);
+            return (
+              <motion.div
+                key={plane.id}
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="grid grid-cols-[60px_1fr_56px_40px] px-4 py-2.5 items-center cursor-pointer hover:bg-black/5 transition-colors"
+                style={{
+                  background: idx % 2 === 0 ? rowEven : rowOdd,
+                  borderBottom: `1px solid ${borderColor}`,
+                }}
+                onClick={() => onPlaneClick(plane)}
+              >
+                {/* Flight ID */}
+                <span
+                  className="text-[11px] font-mono font-bold tracking-wider"
+                  style={{ color: isRead ? mutedColor : textColor }}
+                >
+                  {plane.id.slice(-4).toUpperCase()}
+                </span>
+
+                {/* Sender */}
+                <span
+                  className="text-[11px] truncate pr-2"
+                  style={{ color: isRead ? mutedColor : textColor }}
+                >
+                  {plane.senderName || 'Anonymous'}
+                </span>
+
+                {/* Time */}
+                <span className="text-[10px] font-mono" style={{ color: mutedColor }}>
+                  {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+
+                {/* Status dot */}
+                <div className="flex justify-center">
+                  {isRead ? (
+                    <span className="text-[9px]" style={{ color: mutedColor }}>Read</span>
+                  ) : (
+                    <span className="w-2.5 h-2.5 rounded-full" style={{ background: '#e87060' }} />
+                  )}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+
+        {planes.length === 0 && (
+          <div className="flex flex-col items-center justify-center py-12 opacity-40">
+            <ArrivalIcon />
+            <p className="text-xs mt-2" style={{ color: mutedColor }}>No arrivals yet</p>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -263,19 +454,16 @@ function MessageModal({
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
 
-      {/* Card */}
       <motion.div
         className="relative w-full max-w-md rounded-2xl shadow-2xl p-6"
-        style={{ background: COLORS.cardBg, color: COLORS.text }}
+        style={{ background: 'rgba(255,255,255,0.97)', color: '#1a2a3a' }}
         initial={{ scale: 0.9, y: 20 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.9, y: 20 }}
         transition={{ type: 'spring', stiffness: 300, damping: 25 }}
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 opacity-40 hover:opacity-100 transition-opacity"
@@ -283,39 +471,35 @@ function MessageModal({
           <CloseIcon />
         </button>
 
-        {/* Flight ID */}
         <div className="flex items-center gap-2 mb-1">
-          <span className="text-[10px] font-bold tracking-wider font-mono" style={{ color: COLORS.gateBuilding }}>
+          <span className="text-[10px] font-bold tracking-wider font-mono" style={{ color: '#2a5a6a' }}>
             FLIGHT {plane.id.slice(-6).toUpperCase()}
           </span>
         </div>
 
-        {/* Sender & Time */}
         <div className="flex items-center gap-3 mb-4">
-          <span className="text-xs" style={{ opacity: 0.6 }}>
+          <span className="text-xs opacity-60">
             {plane.senderName || 'Anonymous Passenger'}
           </span>
-          <span className="text-xs" style={{ opacity: 0.4 }}>
+          <span className="text-xs opacity-40">
             {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
           </span>
         </div>
 
-        {/* Message content */}
         <div className="rounded-xl p-4 mb-5" style={{ background: '#f5f3ef' }}>
-          <p className="text-sm leading-relaxed" style={{ color: COLORS.text }}>
+          <p className="text-sm leading-relaxed" style={{ color: '#1a2a3a' }}>
             {plane.content}
           </p>
         </div>
 
-        {/* Action buttons */}
         <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={plane.isBroadcasted ? onUnbroadcast : onBroadcast}
             className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
             style={{
-              background: plane.isBroadcasted ? COLORS.unreadGlow : 'transparent',
-              color: plane.isBroadcasted ? '#fff' : COLORS.unreadGlow,
-              border: `1.5px solid ${COLORS.unreadGlow}`,
+              background: plane.isBroadcasted ? '#e87060' : 'transparent',
+              color: plane.isBroadcasted ? '#fff' : '#e87060',
+              border: '1.5px solid #e87060',
             }}
           >
             <BroadcastIcon />
@@ -353,6 +537,47 @@ function MessageModal({
   );
 }
 
+// --- Capacity Selector ---
+function CapacitySelector({
+  capacity,
+  onChange,
+  isNight,
+}: {
+  capacity: number;
+  onChange: (val: number) => void;
+  isNight: boolean;
+}) {
+  const trackBg = isNight ? '#1a2540' : '#2a5a6a';
+  const textColor = isNight ? '#a0b8d0' : '#ffffff';
+
+  return (
+    <div
+      className="flex items-center gap-4 px-4 py-2"
+      style={{ background: isNight ? 'rgba(15,26,42,0.9)' : 'rgba(42,90,106,0.85)', backdropFilter: 'blur(4px)' }}
+    >
+      <span className="text-[11px] font-semibold tracking-wide" style={{ color: textColor }}>
+        Terminal Capacity
+      </span>
+      <input
+        type="range"
+        min={5}
+        max={50}
+        step={5}
+        value={capacity}
+        onChange={(e) => onChange(Number(e.target.value))}
+        className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
+        style={{
+          background: `linear-gradient(to right, #e8c040 0%, #e8c040 ${((capacity - 5) / 45) * 100}%, ${trackBg} ${((capacity - 5) / 45) * 100}%, ${trackBg} 100%)`,
+          accentColor: '#e8c040',
+        }}
+      />
+      <span className="text-[11px] font-mono font-bold min-w-[60px] text-right" style={{ color: textColor }}>
+        {capacity} gates
+      </span>
+    </div>
+  );
+}
+
 // --- Main Page Component ---
 export default function AdminRoomPage() {
   const router = useRouter();
@@ -362,6 +587,7 @@ export default function AdminRoomPage() {
   const { theme } = useTheme();
   const isNight = theme === 'night';
 
+  const [capacity, setCapacity] = useState(20);
   const [readIds, setReadIds] = useState<Set<string>>(new Set());
   const [gateAssignments, setGateAssignments] = useState<Map<string, number>>(new Map());
   const [selectedPlane, setSelectedPlane] = useState<PaperPlane | null>(null);
@@ -369,6 +595,8 @@ export default function AdminRoomPage() {
   const [copied, setCopied] = useState(false);
   const prevPlaneIdsRef = useRef<Set<string>>(new Set());
   const initialLoadRef = useRef(true);
+
+  const gates = generateGates(capacity);
 
   useEffect(() => {
     if (!userId) router.push('/login');
@@ -396,16 +624,14 @@ export default function AdminRoomPage() {
     },
   });
 
-  // Assign gates and detect new planes
-  const assignGate = useCallback((planeId: string, currentAssignments: Map<string, number>): number => {
+  const assignGate = useCallback((planeId: string, currentAssignments: Map<string, number>, currentGates: Gate[]): number => {
     const occupiedGates = new Set(currentAssignments.values());
-    for (const gate of GATES) {
+    for (const gate of currentGates) {
       if (!occupiedGates.has(gate.id)) {
         return gate.id;
       }
     }
-    // Overflow: cycle through gates
-    return (currentAssignments.size % GATES.length) + 1;
+    return (currentAssignments.size % currentGates.length) + 1;
   }, []);
 
   useEffect(() => {
@@ -414,10 +640,9 @@ export default function AdminRoomPage() {
     const currentIds = new Set(planesQuery.data.map((p) => p.id));
 
     if (initialLoadRef.current) {
-      // On first load, assign all planes to gates (no animation)
       const assignments = new Map<string, number>();
       planesQuery.data.forEach((plane) => {
-        const gateId = assignGate(plane.id, assignments);
+        const gateId = assignGate(plane.id, assignments, gates);
         assignments.set(plane.id, gateId);
       });
       setGateAssignments(assignments);
@@ -426,7 +651,6 @@ export default function AdminRoomPage() {
       return;
     }
 
-    // Detect new planes
     const newIds: string[] = [];
     currentIds.forEach((id) => {
       if (!prevPlaneIdsRef.current.has(id)) {
@@ -434,7 +658,6 @@ export default function AdminRoomPage() {
       }
     });
 
-    // Detect removed planes
     const removedIds: string[] = [];
     prevPlaneIdsRef.current.forEach((id) => {
       if (!currentIds.has(id)) {
@@ -445,24 +668,20 @@ export default function AdminRoomPage() {
     if (newIds.length > 0 || removedIds.length > 0) {
       setGateAssignments((prev) => {
         const next = new Map(prev);
-        // Free gates from removed planes
         removedIds.forEach((id) => next.delete(id));
-        // Assign new planes to gates
         newIds.forEach((id) => {
-          const gateId = assignGate(id, next);
+          const gateId = assignGate(id, next, gates);
           next.set(id, gateId);
         });
         return next;
       });
 
-      // Trigger landing animation for new planes
       if (newIds.length > 0) {
         setLandingPlanes((prev) => {
           const next = new Set(prev);
           newIds.forEach((id) => next.add(id));
           return next;
         });
-        // Clear landing state after animation
         setTimeout(() => {
           setLandingPlanes((prev) => {
             const next = new Set(prev);
@@ -474,7 +693,19 @@ export default function AdminRoomPage() {
     }
 
     prevPlaneIdsRef.current = currentIds;
-  }, [planesQuery.data, assignGate]);
+  }, [planesQuery.data, assignGate, gates]);
+
+  // Reassign gates when capacity changes
+  useEffect(() => {
+    if (!planesQuery.data || initialLoadRef.current) return;
+    const assignments = new Map<string, number>();
+    planesQuery.data.forEach((plane) => {
+      const gateId = assignGate(plane.id, assignments, gates);
+      assignments.set(plane.id, gateId);
+    });
+    setGateAssignments(assignments);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [capacity]);
 
   const handlePlaneClick = (plane: PaperPlane) => {
     setSelectedPlane(plane);
@@ -495,19 +726,11 @@ export default function AdminRoomPage() {
   const planes = (planesQuery.data ?? []) as PaperPlane[];
 
   return (
-    <div className="h-screen w-screen relative overflow-hidden select-none">
-      {/* Tarmac Background */}
-      <TarmacLayout isNight={isNight} />
-
-      {/* Theme Toggle */}
-      <div className="absolute top-4 right-4 z-30">
-        <ThemeToggle />
-      </div>
-
+    <div className="h-screen w-screen relative overflow-hidden select-none flex flex-col">
       {/* Header Bar */}
       <div
-        className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-4 py-3"
-        style={{ background: 'rgba(26,42,58,0.85)', backdropFilter: 'blur(8px)' }}
+        className="flex items-center gap-3 px-4 py-3 shrink-0 z-20"
+        style={{ background: 'rgba(26,42,58,0.92)', backdropFilter: 'blur(8px)' }}
       >
         <button
           onClick={() => router.push('/dashboard')}
@@ -551,86 +774,107 @@ export default function AdminRoomPage() {
           </div>
         )}
 
-        {/* Plane count */}
         <div className="flex items-center gap-1.5 text-white/60 text-xs">
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
           <span>{planes.length} flights</span>
         </div>
+
+        <div className="ml-2">
+          <ThemeToggle />
+        </div>
       </div>
 
-      {/* Planes on the tarmac */}
-      <div className="absolute inset-0 z-10" style={{ top: '48px' }}>
-        <AnimatePresence>
-          {planes.map((plane) => {
-            const gateId = gateAssignments.get(plane.id);
-            if (!gateId) return null;
-            const gate = GATES.find((g) => g.id === gateId);
-            if (!gate) return null;
+      {/* Capacity Selector */}
+      <CapacitySelector capacity={capacity} onChange={setCapacity} isNight={isNight} />
 
-            const isRead = readIds.has(plane.id);
-            const isLanding = landingPlanes.has(plane.id);
+      {/* Main Content: Two panels */}
+      <div className="flex flex-1 min-h-0">
+        {/* LEFT: Airport Tarmac View (60%) */}
+        <div className="relative w-[60%] h-full overflow-hidden">
+          <TarmacLayout isNight={isNight} gates={gates} capacity={capacity} />
 
-            return (
-              <motion.div
-                key={plane.id}
-                className="absolute cursor-pointer"
-                style={{
-                  left: `${gate.x}%`,
-                  top: `${gate.y}%`,
-                  transform: 'translate(-50%, -50%)',
-                  opacity: isRead ? 0.5 : 1,
-                }}
-                initial={isLanding ? { x: '80vw', y: '50%', scale: 1.2, rotate: -90 } : { scale: 1, rotate: 0 }}
-                animate={{ x: 0, y: 0, scale: 1, rotate: 0 }}
-                exit={{ scale: 0, opacity: 0 }}
-                transition={
-                  isLanding
-                    ? { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }
-                    : { duration: 0.3 }
-                }
-                onClick={() => handlePlaneClick(plane)}
-                whileHover={{ scale: 1.15 }}
-              >
-                {/* Unread glow */}
-                {!isRead && (
+          {/* Planes on the tarmac */}
+          <div className="absolute inset-0 z-10">
+            <AnimatePresence>
+              {planes.map((plane) => {
+                const gateId = gateAssignments.get(plane.id);
+                if (!gateId) return null;
+                const gate = gates.find((g) => g.id === gateId);
+                if (!gate) return null;
+
+                const isRead = readIds.has(plane.id);
+                const isLanding = landingPlanes.has(plane.id);
+
+                return (
                   <motion.div
-                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
-                    style={{ background: COLORS.unreadGlow }}
-                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
-                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
-                  />
-                )}
-                {/* Plane SVG */}
-                <PlaneTopDown isRead={isRead} size={48} />
-                {/* Flight label */}
-                <div
-                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-mono font-bold tracking-wider whitespace-nowrap"
-                  style={{ color: isRead ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)' }}
-                >
-                  {plane.id.slice(-4).toUpperCase()}
-                </div>
-              </motion.div>
-            );
-          })}
-        </AnimatePresence>
-      </div>
-
-      {/* Empty state */}
-      {planes.length === 0 && !planesQuery.isLoading && (
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
-          <div className="opacity-30">
-            <PlaneTopDown isRead={false} size={80} />
+                    key={plane.id}
+                    className="absolute cursor-pointer"
+                    style={{
+                      left: `${gate.x}%`,
+                      top: `${gate.y}%`,
+                      transform: 'translate(-50%, -50%)',
+                      opacity: isRead ? 0.5 : 1,
+                    }}
+                    initial={isLanding ? { x: '80vw', y: '50%', scale: 1.2, rotate: -90 } : { scale: 1, rotate: 0 }}
+                    animate={{ x: 0, y: 0, scale: 1, rotate: 0 }}
+                    exit={{ scale: 0, opacity: 0 }}
+                    transition={
+                      isLanding
+                        ? { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }
+                        : { duration: 0.3 }
+                    }
+                    onClick={() => handlePlaneClick(plane)}
+                    whileHover={{ scale: 1.15 }}
+                  >
+                    {!isRead && (
+                      <motion.div
+                        className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+                        style={{ background: '#e87060' }}
+                        animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                      />
+                    )}
+                    <PlaneTopDown isRead={isRead} size={44} />
+                    <div
+                      className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-mono font-bold tracking-wider whitespace-nowrap"
+                      style={{ color: isRead ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.8)' }}
+                    >
+                      {plane.id.slice(-4).toUpperCase()}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
-          <p className="text-white/40 text-sm mt-4 font-mono tracking-wide">
-            Airspace clear -- awaiting arrivals
-          </p>
-          {room && (
-            <p className="text-white/25 text-xs mt-1 font-mono">
-              Share code {room.code} with passengers
-            </p>
+
+          {/* Empty state */}
+          {planes.length === 0 && !planesQuery.isLoading && (
+            <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+              <div className="opacity-30">
+                <PlaneTopDown isRead={false} size={80} />
+              </div>
+              <p className="text-white/40 text-sm mt-4 font-mono tracking-wide">
+                Airspace clear -- awaiting arrivals
+              </p>
+              {room && (
+                <p className="text-white/25 text-xs mt-1 font-mono">
+                  Share code {room.code} with passengers
+                </p>
+              )}
+            </div>
           )}
         </div>
-      )}
+
+        {/* RIGHT: Arrivals Board (40%) */}
+        <div className="w-[40%] h-full border-l" style={{ borderColor: isNight ? '#1e2e40' : '#d0dae0' }}>
+          <ArrivalsBoard
+            planes={planes}
+            readIds={readIds}
+            isNight={isNight}
+            onPlaneClick={handlePlaneClick}
+          />
+        </div>
+      </div>
 
       {/* Message Modal */}
       <AnimatePresence>
