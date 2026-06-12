@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Noto_Serif_JP } from 'next/font/google';
+import { Noto_Serif_JP, Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
 
@@ -9,15 +9,21 @@ const notoSerif = Noto_Serif_JP({
   variable: '--font-serif',
 });
 
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600', '700'],
+  variable: '--font-sans',
+});
+
 export const metadata: Metadata = {
   title: 'Paper Plane',
-  description: 'Send anonymous questions as paper planes',
+  description: 'Send anonymous questions as paper planes — Modern ZEN x Bangkok Mood',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={notoSerif.variable}>
-      <body className="min-h-screen font-serif antialiased">
+    <html lang="ja" className={`${notoSerif.variable} ${inter.variable}`}>
+      <body className="min-h-screen antialiased">
         <Providers>{children}</Providers>
       </body>
     </html>
