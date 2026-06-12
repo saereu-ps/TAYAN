@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
-import { useUserStore } from '@/stores/user-store';
+import { useUser } from '@clerk/nextjs';
 import { ThemeToggle, useTheme } from '../../theme-provider';
 
 // --- Types ---
@@ -692,7 +692,8 @@ export default function AdminRoomPage() {
   const router = useRouter();
   const params = useParams();
   const roomId = params.roomId as string;
-  const { userId } = useUserStore();
+  const { user: clerkUser, isLoaded } = useUser();
+  const userId = clerkUser?.id || null;
   const { theme } = useTheme();
   const isNight = theme === 'night';
 
@@ -708,8 +709,8 @@ export default function AdminRoomPage() {
   const gates = generateGates(capacity);
 
   useEffect(() => {
-    if (!userId) router.push('/login');
-  }, [userId, router]);
+    if (isLoaded && !clerkUser) router.push('/login');
+  }, [isLoaded, clerkUser, router]);
 
   const roomQuery = trpc.room.getById.useQuery({ id: roomId }, { enabled: !!roomId });
   const planesQuery = trpc.plane.getByRoom.useQuery(
@@ -829,7 +830,8 @@ export default function AdminRoomPage() {
     }
   };
 
-  if (!userId) return null;
+  if (!isLoaded) return <div className="h-screen w-screen flex items-center justify-center" style={{background:"#5b9bd5"}}><p className="text-white/70 text-sm">Loading...</p></div>;
+  if (!clerkUser) return null;
 
   const room = roomQuery.data;
   const planes = (planesQuery.data ?? []) as PaperPlane[];
