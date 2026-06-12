@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
-import { useUserStore } from '@/stores/user-store';
+import { useUser } from '@clerk/nextjs';
 import { ThemeToggle, useTheme } from '../theme-provider';
 
 function AirplaneIcon({ size = 120 }: { size?: number }) {
@@ -135,11 +135,12 @@ export default function CreateRoomPage() {
   const [revealSenders, setRevealSenders] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
-  const { userId } = useUserStore();
+  const { user: clerkUser, isLoaded } = useUser();
+  const userId = clerkUser?.id || null;
 
   useEffect(() => {
-    if (!userId) router.push('/login');
-  }, [userId, router]);
+    if (isLoaded && !clerkUser) router.push('/login');
+  }, [isLoaded, clerkUser, router]);
 
   const createMutation = trpc.room.create.useMutation({
     onSuccess: (room) => {
@@ -166,6 +167,14 @@ export default function CreateRoomPage() {
       ownerId: userId,
     });
   };
+
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#5b9bd5' }}>
+        <p style={{ color: 'rgba(255,255,255,0.7)' }} className="text-sm">Loading...</p>
+      </div>
+    );
+  }
 
   if (!userId) return null;
 
