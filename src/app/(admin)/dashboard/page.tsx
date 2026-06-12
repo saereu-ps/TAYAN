@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
+import { useUser, useClerk } from '@clerk/nextjs';
 import { useEffect } from 'react';
 import { ThemeToggle, useTheme } from '../../theme-provider';
 
@@ -165,14 +166,21 @@ function DashboardBg() {
 export default function DashboardPage() {
   const router = useRouter();
   const { userId, userName, userEmail, logout } = useUserStore();
+  const { user: clerkUser } = useUser();
+  const { signOut } = useClerk();
+
+  // Use Clerk user info if available, fallback to local store
+  const displayName = clerkUser?.firstName || clerkUser?.username || userName || 'Captain';
+  const displayEmail = clerkUser?.primaryEmailAddress?.emailAddress || userEmail || '';
+  const effectiveUserId = clerkUser?.id || userId;
 
   useEffect(() => {
-    if (!userId) router.push('/login');
-  }, [userId, router]);
+    if (!effectiveUserId && !clerkUser) router.push('/login');
+  }, [effectiveUserId, clerkUser, router]);
 
   const roomsQuery = trpc.room.list.useQuery(
-    { ownerId: userId ?? '' },
-    { enabled: !!userId, refetchInterval: 5000 },
+    { ownerId: effectiveUserId ?? '' },
+    { enabled: !!effectiveUserId, refetchInterval: 5000 },
   );
 
   const deleteMutation = trpc.room.delete.useMutation({
@@ -211,8 +219,8 @@ export default function DashboardPage() {
               Flight Schedule
               <SmallPlaneIcon size={20} />
             </h1>
-            <p className="text-xs mt-1 text-white/70">Welcome, Captain {userName}</p>
-            {userEmail && <p className="text-[10px] mt-0.5 text-white/50">{userEmail}</p>}
+            <p className="text-xs mt-1 text-white/70">Welcome, Captain {displayName}</p>
+            {displayEmail && <p className="text-[10px] mt-0.5 text-white/50">{displayEmail}</p>}
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -222,7 +230,7 @@ export default function DashboardPage() {
               <PlusIcon /> Schedule Flight
             </button>
             <button
-              onClick={() => { logout(); router.push('/'); }}
+              onClick={() => { signOut(); logout(); router.push('/'); }}
               className="p-2 rounded-lg transition-all text-white/60 hover:text-white"
               style={{ border: '1px solid rgba(255,255,255,0.3)' }}
               title="Logout"
