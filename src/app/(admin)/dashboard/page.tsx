@@ -166,7 +166,7 @@ function DashboardBg() {
 export default function DashboardPage() {
   const router = useRouter();
   const { userId, userName, userEmail, logout } = useUserStore();
-  const { user: clerkUser } = useUser();
+  const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
   const { signOut } = useClerk();
 
   // Use Clerk user info if available, fallback to local store
@@ -174,9 +174,21 @@ export default function DashboardPage() {
   const displayEmail = clerkUser?.primaryEmailAddress?.emailAddress || userEmail || '';
   const effectiveUserId = clerkUser?.id || userId;
 
+  // Wait for Clerk to finish loading before redirecting
   useEffect(() => {
-    if (!effectiveUserId && !clerkUser) router.push('/login');
-  }, [effectiveUserId, clerkUser, router]);
+    if (clerkLoaded && !clerkUser && !userId) {
+      router.push('/login');
+    }
+  }, [clerkLoaded, clerkUser, userId, router]);
+
+  // Show loading while Clerk is initializing
+  if (!clerkLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#5b9bd5' }}>
+        <p className="text-white/70 text-sm">Loading...</p>
+      </div>
+    );
+  }
 
   const roomsQuery = trpc.room.list.useQuery(
     { ownerId: effectiveUserId ?? '' },
