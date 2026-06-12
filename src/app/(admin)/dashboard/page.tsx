@@ -7,15 +7,33 @@ import { useUserStore } from '@/stores/user-store';
 import { useEffect } from 'react';
 import { ThemeToggle } from '../../theme-provider';
 
-function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
+function AirplaneIcon({ size = 64 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
-        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
+    <svg width={size} height={size * 0.5} viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="65" cy="28" rx="48" ry="9" fill="#f0ebe0"/>
+      <path d="M17 28 C17 34 40 37 65 37 C90 37 113 34 113 28" fill="#2a5a6a" opacity="0.9"/>
+      <path d="M50 32 L38 52 L82 52 L72 32Z" fill="#2a5a6a"/>
+      <path d="M18 28 L10 12 L24 14 L22 28Z" fill="#2a5a6a"/>
+      <path d="M18 22 L14 16 L22 17Z" fill="#f0ebe0"/>
+      <ellipse cx="52" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <ellipse cx="72" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <g fill="#5b9bd5">
+        <rect x="42" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="56" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="70" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="84" y="25" width="3" height="4" rx="1.5"/>
+      </g>
+      <path d="M108 24 Q113 28 108 32" fill="#4a9aba" opacity="0.8"/>
+      <ellipse cx="112" cy="28" rx="4" ry="8" fill="#f0ebe0"/>
+    </svg>
+  );
+}
+
+function SmallPlaneIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"
+        fill="currentColor"/>
     </svg>
   );
 }
@@ -58,37 +76,33 @@ function UsersIcon() {
   );
 }
 
-function FlightBoardBg() {
+function DashboardBg() {
   return (
     <div className="svg-bg">
-      <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Large departure board frame */}
-        <g opacity="0.08" stroke="currentColor" fill="none" strokeWidth="0.8">
-          {/* Board outline */}
-          <rect x="50" y="60" width="1100" height="680" rx="6"/>
-          {/* Header bar */}
-          <rect x="50" y="60" width="1100" height="40" rx="6" fill="rgba(90,154,207,0.05)"/>
-          {/* Column headers */}
-          <line x1="200" y1="60" x2="200" y2="740"/>
-          <line x1="500" y1="60" x2="500" y2="740"/>
-          <line x1="720" y1="60" x2="720" y2="740"/>
-          <line x1="900" y1="60" x2="900" y2="740"/>
-          {/* Rows */}
-          {Array.from({ length: 10 }).map((_, i) => (
-            <line key={i} x1="50" y1={140 + i * 60} x2="1150" y2={140 + i * 60} strokeWidth="0.3"/>
-          ))}
-        </g>
+      <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
+        {/* Sky blue */}
+        <rect width="1200" height="800" fill="#5b9bd5"/>
 
-        {/* Clock */}
-        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8">
-          <circle cx="1100" cy="30" r="18"/>
-          <line x1="1100" y1="15" x2="1100" y2="30"/>
-          <line x1="1100" y1="30" x2="1110" y2="35"/>
-        </g>
+        {/* Cloud layer at bottom — cream filled shapes */}
+        <ellipse cx="150" cy="720" rx="200" ry="60" fill="#f5e8c8" opacity="0.6"/>
+        <ellipse cx="400" cy="740" rx="250" ry="70" fill="#f5e8c8" opacity="0.5"/>
+        <ellipse cx="700" cy="730" rx="280" ry="65" fill="#f5e8c8" opacity="0.55"/>
+        <ellipse cx="1000" cy="720" rx="220" ry="55" fill="#f5e8c8" opacity="0.5"/>
+        <ellipse cx="300" cy="760" rx="300" ry="80" fill="#f5e8c8" opacity="0.7"/>
+        <ellipse cx="800" cy="770" rx="350" ry="90" fill="#f5e8c8" opacity="0.65"/>
 
-        {/* Small airplane decorations */}
-        <g opacity="0.06" fill="currentColor">
-          <g transform="translate(80, 75) scale(0.4)">
+        {/* Tiny airplane silhouettes scattered — dark teal fill */}
+        <g fill="#2a5a6a" opacity="0.2">
+          <g transform="translate(200, 150) scale(0.4) rotate(-10)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+          <g transform="translate(900, 200) scale(0.3) rotate(5)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+          <g transform="translate(600, 100) scale(0.25) rotate(-5)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+          <g transform="translate(1050, 350) scale(0.35) rotate(8)">
             <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
           </g>
         </g>
@@ -122,18 +136,18 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <FlightBoardBg />
+      <DashboardBg />
       <ThemeToggle />
 
       <div className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="heading text-xl font-semibold flex items-center gap-2">
+            <h1 className="heading text-xl font-semibold flex items-center gap-3 text-white drop-shadow-sm">
               Flight Schedule
-              <span className="text-lg">✈️</span>
+              <SmallPlaneIcon size={20} />
             </h1>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>Welcome, Captain {userName}</p>
+            <p className="text-xs mt-1 text-white/70">Welcome, Captain {userName}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -144,8 +158,8 @@ export default function DashboardPage() {
             </button>
             <button
               onClick={() => { logout(); router.push('/'); }}
-              className="p-2 rounded-lg transition-all"
-              style={{ color: 'var(--ink-muted)', border: '1px solid var(--border)' }}
+              className="p-2 rounded-lg transition-all text-white/60 hover:text-white"
+              style={{ border: '1px solid rgba(255,255,255,0.3)' }}
               title="Logout"
             >
               <LogoutIcon />
@@ -156,7 +170,7 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           <div className="card text-center py-4">
-            <p className="text-2xl font-semibold" style={{ color: 'var(--blue)' }}>{rooms.length}</p>
+            <p className="text-2xl font-semibold" style={{ color: 'var(--teal)' }}>{rooms.length}</p>
             <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Total Flights</p>
           </div>
           <div className="card text-center py-4">
@@ -164,23 +178,12 @@ export default function DashboardPage() {
             <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Boarding</p>
           </div>
           <div className="card text-center py-4">
-            <p className="text-2xl font-semibold" style={{ color: 'var(--amber)' }}>{totalParticipants}</p>
+            <p className="text-2xl font-semibold" style={{ color: 'var(--orange)' }}>{totalParticipants}</p>
             <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Passengers</p>
           </div>
         </div>
 
-        {/* Flight Board Table Header */}
-        {rooms.length > 0 && (
-          <div className="flex items-center px-5 py-2 mb-1 rounded-lg" style={{ background: 'var(--blue-light)' }}>
-            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20" style={{ color: 'var(--blue)' }}>Flight</span>
-            <span className="fids-font text-[9px] uppercase tracking-widest font-medium flex-1" style={{ color: 'var(--blue)' }}>Destination</span>
-            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20 text-center" style={{ color: 'var(--blue)' }}>Status</span>
-            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20 text-center" style={{ color: 'var(--blue)' }}>Gate</span>
-            <span className="w-10" />
-          </div>
-        )}
-
-        {/* Room List as Flight Board */}
+        {/* Room List — Boarding pass style cards */}
         {rooms.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -188,57 +191,51 @@ export default function DashboardPage() {
             className="card text-center py-16"
           >
             <div className="opacity-20 mb-4 flex justify-center">
-              <AirplaneIcon size={48} />
+              <AirplaneIcon size={56} />
             </div>
             <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>No flights scheduled</p>
             <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>Schedule your first flight to get started</p>
           </motion.div>
         ) : (
-          <div className="card overflow-hidden !p-0">
+          <div className="space-y-3">
             {rooms.map((room, i) => (
               <motion.div
                 key={room.id}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.04 }}
-                className="flight-row cursor-pointer"
+                className="card cursor-pointer relative overflow-hidden hover:shadow-lg transition-shadow"
                 onClick={() => router.push(`/admin/${room.id}`)}
+                style={{ borderLeft: '4px solid var(--accent)' }}
               >
-                {/* Flight code */}
-                <span className="fids-font text-xs font-bold tracking-wider w-20" style={{ color: 'var(--ink)' }}>
-                  {room.code}
-                </span>
-
-                {/* Destination (room name) */}
-                <span className="flex-1 text-sm font-medium truncate pr-4">
-                  {room.name}
-                </span>
-
-                {/* Status */}
-                <span className="w-20 text-center">
-                  <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
-                    {room.status === 'active' ? 'Boarding' : room.status === 'paused' ? 'Delayed' : 'Landed'}
-                  </span>
-                </span>
-
-                {/* Gate (participants) */}
-                <span className="w-20 flex items-center justify-center gap-1 text-xs" style={{ color: 'var(--ink-muted)' }}>
-                  <UsersIcon /> {room.participantCount}
-                </span>
-
-                {/* Delete */}
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (confirm('Cancel this flight?')) {
-                      deleteMutation.mutate({ id: room.id });
-                    }
-                  }}
-                  className="w-10 flex justify-end p-1 rounded opacity-30 hover:opacity-70 transition-opacity"
-                  style={{ color: 'var(--error)' }}
-                >
-                  <TrashIcon />
-                </button>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <span className="fids-font text-sm font-bold tracking-wider" style={{ color: 'var(--teal)' }}>
+                      {room.code}
+                    </span>
+                    <span className="text-sm font-medium truncate">{room.name}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
+                      {room.status === 'active' ? 'Boarding' : room.status === 'paused' ? 'Delayed' : 'Landed'}
+                    </span>
+                    <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                      <UsersIcon /> {room.participantCount}
+                    </span>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (confirm('Cancel this flight?')) {
+                          deleteMutation.mutate({ id: room.id });
+                        }
+                      }}
+                      className="p-1 rounded opacity-30 hover:opacity-70 transition-opacity"
+                      style={{ color: 'var(--error)' }}
+                    >
+                      <TrashIcon />
+                    </button>
+                  </div>
+                </div>
               </motion.div>
             ))}
           </div>

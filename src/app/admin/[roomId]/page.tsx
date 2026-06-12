@@ -7,32 +7,34 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from '../../theme-provider';
 
-const AIRLINES = [
-  { name: 'Thai Airways', className: 'airline-thai', label: 'TG' },
-  { name: 'AirAsia', className: 'airline-airasia', label: 'FD' },
-  { name: 'Bangkok Airways', className: 'airline-bangkok', label: 'PG' },
-  { name: 'Nok Air', className: 'airline-nok', label: 'DD' },
-  { name: 'Thai Smile', className: 'airline-smile', label: 'WE' },
-];
-
-function getAirlineForId(id: string) {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = ((hash << 5) - hash) + id.charCodeAt(i);
-    hash |= 0;
-  }
-  return AIRLINES[Math.abs(hash) % AIRLINES.length];
+function AirplaneIcon({ size = 64 }: { size?: number }) {
+  return (
+    <svg width={size} height={size * 0.5} viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="65" cy="28" rx="48" ry="9" fill="#f0ebe0"/>
+      <path d="M17 28 C17 34 40 37 65 37 C90 37 113 34 113 28" fill="#2a5a6a" opacity="0.9"/>
+      <path d="M50 32 L38 52 L82 52 L72 32Z" fill="#2a5a6a"/>
+      <path d="M18 28 L10 12 L24 14 L22 28Z" fill="#2a5a6a"/>
+      <path d="M18 22 L14 16 L22 17Z" fill="#f0ebe0"/>
+      <ellipse cx="52" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <ellipse cx="72" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <g fill="#5b9bd5">
+        <rect x="35" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="49" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="63" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="77" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="91" y="25" width="3" height="4" rx="1.5"/>
+      </g>
+      <path d="M108 24 Q113 28 108 32" fill="#4a9aba" opacity="0.8"/>
+      <ellipse cx="112" cy="28" rx="4" ry="8" fill="#f0ebe0"/>
+    </svg>
+  );
 }
 
-function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
+function SmallPlaneIcon({ size = 20 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
-        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"
+        fill="currentColor"/>
     </svg>
   );
 }
@@ -95,47 +97,29 @@ function RadarBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Concentric radar circles */}
-        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8">
-          <circle cx="600" cy="400" r="100"/>
-          <circle cx="600" cy="400" r="200"/>
-          <circle cx="600" cy="400" r="300"/>
-          <circle cx="600" cy="400" r="400"/>
-          <circle cx="600" cy="400" r="500"/>
-        </g>
+        {/* Deeper sky */}
+        <rect width="1200" height="800" fill="#4a8ac5"/>
 
-        {/* Crosshair lines */}
-        <g opacity="0.06" stroke="currentColor" strokeWidth="0.5">
-          <line x1="600" y1="0" x2="600" y2="800"/>
-          <line x1="0" y1="400" x2="1200" y2="400"/>
-          <line x1="175" y1="0" x2="1025" y2="800"/>
-          <line x1="1025" y1="0" x2="175" y2="800"/>
-        </g>
+        {/* Concentric radar circles in cream */}
+        <circle cx="600" cy="400" r="100" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="200" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="300" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="400" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="500" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
 
-        {/* Blips — aircraft on radar */}
-        <g opacity="0.2" fill="currentColor">
-          <circle cx="450" cy="250" r="4"/>
-          <circle cx="750" cy="320" r="3"/>
-          <circle cx="380" cy="500" r="3"/>
-          <circle cx="820" cy="480" r="4"/>
-          <circle cx="550" cy="180" r="2.5"/>
-          <circle cx="700" cy="600" r="3"/>
-        </g>
+        {/* Crosshairs */}
+        <line x1="600" y1="0" x2="600" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.1"/>
+        <line x1="0" y1="400" x2="1200" y2="400" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.1"/>
+        <line x1="175" y1="0" x2="1025" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.08"/>
+        <line x1="1025" y1="0" x2="175" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.08"/>
 
-        {/* Blip trails */}
-        <g opacity="0.08" stroke="currentColor" strokeWidth="1" strokeDasharray="3 4">
-          <line x1="450" y1="250" x2="420" y2="270"/>
-          <line x1="750" y1="320" x2="770" y2="340"/>
-          <line x1="820" y1="480" x2="840" y2="460"/>
-        </g>
-
-        {/* Grid labels feel */}
-        <g opacity="0.05" fill="currentColor" fontSize="8" fontFamily="monospace">
-          <text x="610" y="108">100</text>
-          <text x="610" y="208">200</text>
-          <text x="610" y="308">300</text>
-          <text x="610" y="508">500</text>
-        </g>
+        {/* Radar blips */}
+        <circle cx="450" cy="250" r="4" fill="#f0ebe0" opacity="0.25"/>
+        <circle cx="750" cy="320" r="3" fill="#f0ebe0" opacity="0.2"/>
+        <circle cx="380" cy="500" r="3" fill="#f0ebe0" opacity="0.2"/>
+        <circle cx="820" cy="480" r="4" fill="#f0ebe0" opacity="0.25"/>
+        <circle cx="550" cy="180" r="2.5" fill="#f0ebe0" opacity="0.18"/>
+        <circle cx="700" cy="600" r="3" fill="#f0ebe0" opacity="0.2"/>
       </svg>
     </div>
   );
@@ -174,7 +158,6 @@ export default function AdminRoomPage() {
     onSuccess: () => planesQuery.refetch(),
   });
 
-  // Track new planes for fly-in animation
   useEffect(() => {
     if (!planesQuery.data) return;
     if (initialLoadRef.current) {
@@ -232,9 +215,9 @@ export default function AdminRoomPage() {
             <BackIcon />
           </button>
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <h1 className="heading text-xl font-semibold truncate">Control Tower</h1>
-              <span className="text-lg">🗼</span>
+              <SmallPlaneIcon size={20} />
             </div>
             <p className="text-sm mt-0.5" style={{ color: 'var(--ink-muted)' }}>{room?.name ?? 'Loading...'}</p>
             {room && (
@@ -270,13 +253,13 @@ export default function AdminRoomPage() {
           </div>
         </div>
 
-        {/* Planes Feed — Boarding pass style */}
+        {/* Planes Feed */}
         {planes.length === 0 ? (
           <div className="card text-center py-16">
-            <div className="opacity-20 mb-4 flex justify-center" style={{ color: 'var(--ink)' }}>
-              <AirplaneIcon size={48} />
+            <div className="opacity-20 mb-4 flex justify-center">
+              <AirplaneIcon size={56} />
             </div>
-            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Airspace clear — no incoming flights</p>
+            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Airspace clear -- no incoming flights</p>
             <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>
               Share code <span className="fids-font font-mono tracking-wider">{room?.code}</span> with passengers
             </p>
@@ -286,7 +269,6 @@ export default function AdminRoomPage() {
             <AnimatePresence>
               {planes.map((plane) => {
                 const isNew = newPlaneIds.has(plane.id);
-                const airline = getAirlineForId(plane.id);
                 return (
                   <motion.div
                     key={plane.id}
@@ -298,75 +280,64 @@ export default function AdminRoomPage() {
                         ? { type: 'spring', stiffness: 60, damping: 12, duration: 0.8 }
                         : { duration: 0.2 }
                     }
-                    className="card-boarding-pass relative"
+                    className="card relative overflow-hidden"
                   >
-                    {/* Airline color strip */}
-                    <div className={`h-1.5 ${airline.className}`} />
-
-                    {/* Flying plane icon for new messages */}
+                    {/* New indicator */}
                     {isNew && (
                       <motion.div
-                        className="absolute -top-2 -right-2"
-                        initial={{ scale: 1.5, opacity: 1, x: 20 }}
-                        animate={{ scale: 0, opacity: 0, x: 0 }}
-                        transition={{ duration: 1, delay: 0.3 }}
-                        style={{ color: 'var(--blue)' }}
-                      >
-                        <AirplaneIcon size={20} />
-                      </motion.div>
+                        className="absolute top-4 right-4 new-indicator"
+                        initial={{ scale: 1.5 }}
+                        animate={{ scale: 1 }}
+                        transition={{ duration: 0.5 }}
+                      />
                     )}
 
-                    <div className="px-5 py-4">
-                      {/* Flight info header */}
-                      <div className="flex items-center justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <span className="fids-font text-[10px] font-bold tracking-wider">{airline.label}-{plane.id.slice(-4).toUpperCase()}</span>
-                          <span className="text-[9px]" style={{ color: 'var(--ink-muted)' }}>{airline.name}</span>
-                        </div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="fids-font text-[10px] font-bold tracking-wider">{plane.id.slice(-5).toUpperCase()}</span>
                         <span className="fids-font text-[10px]" style={{ color: 'var(--ink-muted)' }}>
                           {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
+                      <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>
+                        {plane.senderName || 'Anonymous'}
+                      </span>
+                    </div>
 
-                      <p className="text-sm mb-3 leading-relaxed">{plane.content}</p>
+                    <p className="text-sm mb-4 leading-relaxed">{plane.content}</p>
 
-                      <div className="flex items-center justify-between">
-                        <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>
-                          {plane.senderName || 'Anonymous Passenger'}
-                        </span>
-
-                        <div className="flex items-center gap-1.5">
-                          {/* Clear for broadcast (green) */}
-                          <button
-                            onClick={() =>
-                              plane.isBroadcasted
-                                ? unbroadcastMutation.mutate({ planeId: plane.id })
-                                : broadcastMutation.mutate({ planeId: plane.id })
-                            }
-                            className={`btn-atc-broadcast ${plane.isBroadcasted ? 'active' : ''}`}
-                            title={plane.isBroadcasted ? 'Revoke clearance' : 'Clear for broadcast'}
-                          >
-                            <BroadcastIcon />
-                            <span>{plane.isBroadcasted ? 'On Air' : 'Clear'}</span>
-                          </button>
-                          {/* Hold (amber/pin) */}
-                          <button
-                            onClick={() => pinMutation.mutate({ planeId: plane.id })}
-                            className={`btn-atc-hold ${plane.isPinned ? 'active' : ''}`}
-                            title={plane.isPinned ? 'Release hold' : 'Hold'}
-                          >
-                            <PinIcon />
-                          </button>
-                          {/* Reject (red/remove) */}
-                          <button
-                            onClick={() => removeMutation.mutate({ planeId: plane.id })}
-                            className="btn-atc-reject"
-                            title="Reject"
-                          >
-                            <TrashIcon />
-                          </button>
-                        </div>
-                      </div>
+                    <div className="flex items-center gap-1.5">
+                      {/* Broadcast (coral fill) */}
+                      <button
+                        onClick={() =>
+                          plane.isBroadcasted
+                            ? unbroadcastMutation.mutate({ planeId: plane.id })
+                            : broadcastMutation.mutate({ planeId: plane.id })
+                        }
+                        className={`btn-atc-broadcast ${plane.isBroadcasted ? 'active' : ''}`}
+                        title={plane.isBroadcasted ? 'Revoke broadcast' : 'Broadcast'}
+                      >
+                        <BroadcastIcon />
+                        <span>{plane.isBroadcasted ? 'On Air' : 'Broadcast'}</span>
+                      </button>
+                      {/* Pin (orange outline) */}
+                      <button
+                        onClick={() => pinMutation.mutate({ planeId: plane.id })}
+                        className={`btn-atc-hold ${plane.isPinned ? 'active' : ''}`}
+                        title={plane.isPinned ? 'Unpin' : 'Pin'}
+                      >
+                        <PinIcon />
+                        <span>Pin</span>
+                      </button>
+                      {/* Remove (dark outline) */}
+                      <button
+                        onClick={() => removeMutation.mutate({ planeId: plane.id })}
+                        className="btn-atc-reject"
+                        title="Remove"
+                      >
+                        <TrashIcon />
+                        <span>Remove</span>
+                      </button>
                     </div>
                   </motion.div>
                 );

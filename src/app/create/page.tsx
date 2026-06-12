@@ -7,15 +7,33 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from '../theme-provider';
 
-function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
+function AirplaneIcon({ size = 64 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
-      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
-        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
-      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
-      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
+    <svg width={size} height={size * 0.5} viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="65" cy="28" rx="48" ry="9" fill="#f0ebe0"/>
+      <path d="M17 28 C17 34 40 37 65 37 C90 37 113 34 113 28" fill="#2a5a6a" opacity="0.9"/>
+      <path d="M50 32 L38 52 L82 52 L72 32Z" fill="#2a5a6a"/>
+      <path d="M18 28 L10 12 L24 14 L22 28Z" fill="#2a5a6a"/>
+      <path d="M18 22 L14 16 L22 17Z" fill="#f0ebe0"/>
+      <ellipse cx="52" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <ellipse cx="72" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
+      <g fill="#5b9bd5">
+        <rect x="42" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="56" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="70" y="25" width="3" height="4" rx="1.5"/>
+        <rect x="84" y="25" width="3" height="4" rx="1.5"/>
+      </g>
+      <path d="M108 24 Q113 28 108 32" fill="#4a9aba" opacity="0.8"/>
+      <ellipse cx="112" cy="28" rx="4" ry="8" fill="#f0ebe0"/>
+    </svg>
+  );
+}
+
+function SmallPlaneIcon({ size = 20 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"
+        fill="currentColor"/>
     </svg>
   );
 }
@@ -28,50 +46,36 @@ function BackIcon() {
   );
 }
 
-function ScheduleBoardBg() {
+function CreateBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Airport runway pattern */}
-        <g opacity="0.08" stroke="currentColor" fill="none" strokeWidth="0.6">
-          {/* Taxiway lines */}
-          <path d="M0 700 L300 700 Q350 700 350 650 L350 400" strokeDasharray="10 8"/>
-          <path d="M600 800 L600 500 Q600 450 650 450 L1200 450" strokeDasharray="10 8"/>
-          {/* Runway outline */}
-          <rect x="800" y="100" width="60" height="600" rx="4"/>
-          <line x1="830" y1="120" x2="830" y2="680" strokeDasharray="25 15" strokeWidth="1.5"/>
-          {/* Threshold markings */}
-          <line x1="810" y1="130" x2="810" y2="180" strokeWidth="2"/>
-          <line x1="820" y1="130" x2="820" y2="180" strokeWidth="2"/>
-          <line x1="840" y1="130" x2="840" y2="180" strokeWidth="2"/>
-          <line x1="850" y1="130" x2="850" y2="180" strokeWidth="2"/>
-        </g>
+        {/* Sky blue */}
+        <rect width="1200" height="800" fill="#5b9bd5"/>
 
-        {/* Gate assignments */}
-        <g opacity="0.06" fill="currentColor" fontSize="10" fontFamily="monospace">
-          <text x="100" y="200">A1</text>
-          <text x="100" y="300">A2</text>
-          <text x="100" y="400">A3</text>
-          <text x="200" y="200">B1</text>
-          <text x="200" y="300">B2</text>
-        </g>
-
-        {/* Aircraft silhouettes at gates */}
-        <g opacity="0.06" fill="currentColor">
-          <g transform="translate(130, 220) scale(0.35) rotate(90)">
+        {/* 3-4 scattered airplane silhouettes in dark teal at various angles/sizes */}
+        <g fill="#2a5a6a">
+          {/* Top-left, medium, tilted left */}
+          <g transform="translate(150, 120) scale(0.6) rotate(-15)" opacity="0.3">
             <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
           </g>
-          <g transform="translate(230, 320) scale(0.3) rotate(90)">
+          {/* Top-right, small, tilted right */}
+          <g transform="translate(950, 100) scale(0.4) rotate(12)" opacity="0.25">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+          {/* Bottom-left, large, slight tilt */}
+          <g transform="translate(100, 600) scale(0.7) rotate(-8)" opacity="0.2">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+          {/* Right middle, medium */}
+          <g transform="translate(1020, 450) scale(0.5) rotate(20)" opacity="0.22">
             <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
           </g>
         </g>
 
-        {/* Wind sock */}
-        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8" transform="translate(1050, 150)">
-          <line x1="0" y1="0" x2="0" y2="60"/>
-          <path d="M0 0 L30 5 L30 -5 Z" fill="rgba(232,50,50,0.3)"/>
-          <path d="M0 0 L30 5 L25 10" strokeWidth="0.5"/>
-        </g>
+        {/* Light contrail streaks */}
+        <line x1="100" y1="160" x2="350" y2="140" stroke="#f5e0b0" strokeWidth="3" opacity="0.3" strokeLinecap="round"/>
+        <line x1="850" y1="130" x2="1100" y2="110" stroke="#f5e0b0" strokeWidth="2" opacity="0.25" strokeLinecap="round"/>
       </svg>
     </div>
   );
@@ -116,15 +120,14 @@ export default function CreateRoomPage() {
 
   return (
     <div className="min-h-screen px-6 py-8 relative overflow-hidden">
-      <ScheduleBoardBg />
+      <CreateBg />
       <ThemeToggle />
 
       <div className="relative z-10 max-w-lg mx-auto">
         {/* Back */}
         <button
           onClick={() => router.push('/dashboard')}
-          className="flex items-center gap-2 text-sm mb-8 transition-opacity hover:opacity-80"
-          style={{ color: 'var(--ink-muted)' }}
+          className="flex items-center gap-2 text-sm mb-8 transition-opacity hover:opacity-80 text-white/70"
         >
           <BackIcon /> Back to flight schedule
         </button>
@@ -135,22 +138,19 @@ export default function CreateRoomPage() {
           transition={{ duration: 0.5 }}
         >
           <div className="flex items-center gap-3 mb-6">
-            <h1 className="heading text-xl font-semibold">Schedule New Flight</h1>
+            <h1 className="heading text-xl font-semibold text-white drop-shadow-sm">Schedule Flight</h1>
             <motion.div
-              style={{ color: 'var(--blue)' }}
+              style={{ color: 'var(--cream)' }}
               animate={{ x: [0, 4, 0] }}
               transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
             >
-              <AirplaneIcon size={24} />
+              <SmallPlaneIcon size={22} />
             </motion.div>
           </div>
 
           <form onSubmit={handleSubmit} className="card relative overflow-hidden space-y-5">
-            {/* Airline stripe */}
-            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#76b82a] via-[#ffd100] to-[#f58220]" />
-
             {/* Destination (Room Name) */}
-            <div className="mt-2">
+            <div>
               <label className="block fids-font text-[10px] uppercase tracking-widest font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>Destination</label>
               <input
                 type="text"
@@ -174,9 +174,9 @@ export default function CreateRoomPage() {
                   onClick={() => setIdentityMode('anonymous')}
                   className="flex-1 p-4 rounded-xl text-center transition-all border-2"
                   style={{
-                    background: identityMode === 'anonymous' ? 'var(--blue-light)' : 'transparent',
-                    borderColor: identityMode === 'anonymous' ? 'var(--blue)' : 'var(--border)',
-                    color: identityMode === 'anonymous' ? 'var(--blue)' : 'var(--ink)',
+                    background: identityMode === 'anonymous' ? 'rgba(42,90,106,0.1)' : 'transparent',
+                    borderColor: identityMode === 'anonymous' ? 'var(--teal)' : 'var(--border)',
+                    color: identityMode === 'anonymous' ? 'var(--teal)' : 'var(--ink)',
                   }}
                 >
                   <p className="text-sm font-semibold">Anonymous</p>
@@ -187,9 +187,9 @@ export default function CreateRoomPage() {
                   onClick={() => setIdentityMode('identified')}
                   className="flex-1 p-4 rounded-xl text-center transition-all border-2"
                   style={{
-                    background: identityMode === 'identified' ? 'var(--blue-light)' : 'transparent',
-                    borderColor: identityMode === 'identified' ? 'var(--blue)' : 'var(--border)',
-                    color: identityMode === 'identified' ? 'var(--blue)' : 'var(--ink)',
+                    background: identityMode === 'identified' ? 'rgba(42,90,106,0.1)' : 'transparent',
+                    borderColor: identityMode === 'identified' ? 'var(--teal)' : 'var(--border)',
+                    color: identityMode === 'identified' ? 'var(--teal)' : 'var(--ink)',
                   }}
                 >
                   <p className="text-sm font-semibold">Identified</p>
@@ -198,7 +198,7 @@ export default function CreateRoomPage() {
               </div>
               <p className="text-[10px] mt-2" style={{ color: 'var(--ink-muted)' }}>
                 {identityMode === 'anonymous'
-                  ? 'Passengers can board without showing ID — messages are anonymous'
+                  ? 'Passengers can board without showing ID -- messages are anonymous'
                   : 'Passengers must provide their name at the gate'}
               </p>
             </div>
@@ -215,7 +215,7 @@ export default function CreateRoomPage() {
               disabled={createMutation.isPending}
             >
               <span>{createMutation.isPending ? 'Scheduling...' : 'Schedule Flight'}</span>
-              <AirplaneIcon size={18} />
+              <SmallPlaneIcon size={18} />
             </button>
           </form>
         </motion.div>
