@@ -61,6 +61,17 @@ function SmallPlaneIcon({ size = 20 }: { size?: number }) {
   );
 }
 
+function GoogleLogo() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+  );
+}
+
 function LoginBg() {
   const { theme } = useTheme();
   const isNight = theme === 'night';
@@ -130,12 +141,23 @@ function LoginBg() {
 export default function LoginPage() {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
+  const [pendingEmail, setPendingEmail] = useState('');
   const router = useRouter();
   const { setUser } = useUserStore();
 
   const loginMutation = trpc.auth.login.useMutation({
     onSuccess: (data) => {
       setUser(data.id, data.name);
+      router.push('/dashboard');
+    },
+    onError: () => {
+      setError('Something went wrong. Please try again.');
+    },
+  });
+
+  const googleLoginMutation = trpc.auth.login.useMutation({
+    onSuccess: (data) => {
+      setUser(data.id, data.name, pendingEmail);
       router.push('/dashboard');
     },
     onError: () => {
@@ -151,6 +173,16 @@ export default function LoginPage() {
     }
     setError('');
     loginMutation.mutate({ name: name.trim() });
+  };
+
+  const handleGoogleSignIn = () => {
+    const email = window.prompt('Enter your Google email (simulated OAuth):');
+    if (!email || !email.trim()) return;
+    const emailTrimmed = email.trim();
+    const displayName = emailTrimmed.split('@')[0];
+    setError('');
+    setPendingEmail(emailTrimmed);
+    googleLoginMutation.mutate({ name: displayName });
   };
 
   return (
@@ -180,30 +212,52 @@ export default function LoginPage() {
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="card relative overflow-hidden">
-          <label className="block text-[10px] uppercase tracking-widest font-medium mb-2 fids-font" style={{ color: 'var(--ink-muted)' }}>Crew Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Enter your name"
-            className="input-zen mb-4"
-            autoFocus
-          />
-          {error && (
-            <p className="text-xs mb-3" style={{ color: 'var(--error)' }}>
-              {error}
-            </p>
-          )}
+        <div className="card relative overflow-hidden">
+          {/* Google Sign In */}
           <button
-            type="submit"
-            className="btn-takeoff w-full"
-            disabled={loginMutation.isPending}
+            type="button"
+            onClick={handleGoogleSignIn}
+            disabled={googleLoginMutation.isPending}
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all hover:shadow-md mb-5"
+            style={{ background: '#fff', border: '1px solid #dadce0', color: '#3c4043' }}
           >
-            <span>{loginMutation.isPending ? 'Checking in...' : 'Check In'}</span>
-            <SmallPlaneIcon size={16} />
+            <GoogleLogo />
+            <span>{googleLoginMutation.isPending ? 'Signing in...' : 'Sign in with Google'}</span>
           </button>
-        </form>
+
+          {/* Divider */}
+          <div className="flex items-center gap-3 mb-5">
+            <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+            <span className="text-[10px] uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>or continue without Google</span>
+            <div className="flex-1 h-px" style={{ background: 'var(--border)' }} />
+          </div>
+
+          {/* Name-only login */}
+          <form onSubmit={handleSubmit}>
+            <label className="block text-[10px] uppercase tracking-widest font-medium mb-2 fids-font" style={{ color: 'var(--ink-muted)' }}>Crew Name</label>
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your name"
+              className="input-zen mb-4"
+              autoFocus
+            />
+            {error && (
+              <p className="text-xs mb-3" style={{ color: 'var(--error)' }}>
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              className="btn-takeoff w-full"
+              disabled={loginMutation.isPending}
+            >
+              <span>{loginMutation.isPending ? 'Checking in...' : 'Check In'}</span>
+              <SmallPlaneIcon size={16} />
+            </button>
+          </form>
+        </div>
 
         <div className="text-center mt-6">
           <button

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { ThemeToggle, useTheme } from '../../theme-provider';
@@ -121,6 +121,7 @@ function TerminalWindowBg() {
 
 export default function ParticipantRoomPage() {
   const params = useParams();
+  const router = useRouter();
   const code = (params.code as string).toUpperCase();
   const [name, setName] = useState('');
   const [joined, setJoined] = useState(false);
@@ -192,6 +193,19 @@ export default function ParticipantRoomPage() {
         <TerminalWindowBg />
         <ThemeToggle />
 
+        {/* Home button */}
+        <button
+          onClick={() => router.push('/')}
+          className="fixed top-5 left-5 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+          style={{ background: 'var(--bg-card, rgba(255,255,255,0.95))', border: '1px solid var(--border, #e8e0d4)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          title="Home"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </button>
+
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-sm text-center">
           <motion.div
             initial={{ scale: 0.8, rotate: -10 }}
@@ -255,6 +269,19 @@ export default function ParticipantRoomPage() {
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <TerminalWindowBg />
       <ThemeToggle />
+
+      {/* Home button */}
+      <button
+        onClick={() => router.push('/')}
+        className="fixed top-5 left-5 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+        style={{ background: 'var(--bg-card, rgba(255,255,255,0.95))', border: '1px solid var(--border, #e8e0d4)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+        title="Home"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+      </button>
 
       {/* === SEND ANIMATION === */}
       <AnimatePresence>
