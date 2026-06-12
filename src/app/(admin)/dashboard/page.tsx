@@ -3,9 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
-import { useUserStore } from '@/stores/user-store';
 import { useUser, useClerk } from '@clerk/nextjs';
-import { useEffect } from 'react';
 import { ThemeToggle, useTheme } from '../../theme-provider';
 
 function AirplaneIcon({ size = 120 }: { size?: number }) {
@@ -165,33 +163,31 @@ function DashboardBg() {
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { userId, userName, userEmail, logout } = useUserStore();
   const { user: clerkUser, isLoaded: clerkLoaded } = useUser();
   const { signOut } = useClerk();
+  const { theme } = useTheme();
+  const isNight = theme === 'night';
 
-  // Use Clerk user info if available, fallback to local store
-  const displayName = clerkUser?.firstName || clerkUser?.username || userName || 'Captain';
-  const displayEmail = clerkUser?.primaryEmailAddress?.emailAddress || userEmail || '';
-  const effectiveUserId = clerkUser?.id || userId;
-
-  // Wait for Clerk to finish loading before redirecting
-  useEffect(() => {
-    if (clerkLoaded && !clerkUser && !userId) {
-      router.push('/login');
-    }
-  }, [clerkLoaded, clerkUser, userId, router]);
+  const displayName = clerkUser?.firstName || clerkUser?.username || 'Captain';
+  const displayEmail = clerkUser?.primaryEmailAddress?.emailAddress || '';
+  const effectiveUserId = clerkUser?.id || 'default';
 
   // Show loading while Clerk is initializing
   if (!clerkLoaded) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#5b9bd5' }}>
-        <p className="text-white/70 text-sm">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: isNight ? '#1a2040' : '#5b9bd5' }}>
+        <p style={{ color: 'rgba(255,255,255,0.7)' }} className="text-sm">Loading...</p>
       </div>
     );
   }
 
+  if (!clerkUser) {
+    router.push('/login');
+    return null;
+  }
+
   const roomsQuery = trpc.room.list.useQuery(
-    { ownerId: effectiveUserId ?? '' },
+    { ownerId: effectiveUserId },
     { enabled: !!effectiveUserId, refetchInterval: 5000 },
   );
 
@@ -199,7 +195,7 @@ export default function DashboardPage() {
     onSuccess: () => roomsQuery.refetch(),
   });
 
-  if (!userId) return null;
+  if (!clerkUser) return null;
 
   const rooms = roomsQuery.data ?? [];
   const activeCount = rooms.filter(r => r.status === 'active').length;
@@ -242,7 +238,7 @@ export default function DashboardPage() {
               <PlusIcon /> Schedule Flight
             </button>
             <button
-              onClick={() => { signOut(); logout(); router.push('/'); }}
+              onClick={() => { signOut(); router.push('/'); }}
               className="p-2 rounded-lg transition-all text-white/60 hover:text-white"
               style={{ border: '1px solid rgba(255,255,255,0.3)' }}
               title="Logout"
