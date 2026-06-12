@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { signIn } from 'next-auth/react';
 import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle, useTheme } from '../../theme-provider';
@@ -176,13 +177,7 @@ export default function LoginPage() {
   };
 
   const handleGoogleSignIn = () => {
-    const email = window.prompt('Enter your Google email (simulated OAuth):');
-    if (!email || !email.trim()) return;
-    const emailTrimmed = email.trim();
-    const displayName = emailTrimmed.split('@')[0];
-    setError('');
-    setPendingEmail(emailTrimmed);
-    googleLoginMutation.mutate({ name: displayName });
+    signIn('google', { callbackUrl: '/dashboard' });
   };
 
   return (

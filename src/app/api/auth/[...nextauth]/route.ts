@@ -1,11 +1,25 @@
-// NextAuth disabled for in-memory demo
-// All auth is handled via simple name-based login stored in memory
-import { NextResponse } from 'next/server';
+import NextAuth from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
 
-export function GET() {
-  return NextResponse.json({ message: 'Auth not needed for demo mode' });
-}
+const handler = NextAuth({
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID ?? '',
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? '',
+    }),
+  ],
+  pages: {
+    signIn: '/login',
+  },
+  callbacks: {
+    async session({ session, token }) {
+      if (session.user) {
+        (session.user as any).id = token.sub;
+      }
+      return session;
+    },
+  },
+  secret: process.env.NEXTAUTH_SECRET ?? 'dev-secret-change-in-production',
+});
 
-export function POST() {
-  return NextResponse.json({ message: 'Auth not needed for demo mode' });
-}
+export { handler as GET, handler as POST };
