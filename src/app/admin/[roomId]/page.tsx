@@ -202,9 +202,9 @@ function TerminalBuildings({ gates, capacity, isNight }: { gates: Gate[]; capaci
 // --- Tarmac Layout ---
 function TarmacLayout({ isNight, gates, capacity }: { isNight: boolean; gates: Gate[]; capacity: number }) {
   const bgColor = isNight ? '#1a2540' : '#5b9bd5';
-  const tarmacColor = isNight ? '#2a3a4a' : '#6b8090';
-  const runwayColor = isNight ? '#1a2a35' : '#5a7080';
-  const gateBadgeColor = isNight ? '#1a3a4a' : '#2a5a6a';
+  const tarmacColor = isNight ? '#2a3a4a' : '#e8e0d4';
+  const runwayColor = isNight ? '#1a2a35' : '#c8bfb0';
+  const gateBadgeColor = isNight ? '#1a3a4a' : '#e87060';
   const markingOpacity = isNight ? 0.4 : 0.7;
   const lightOpacity = isNight ? 0.9 : 0.4;
 
@@ -332,12 +332,12 @@ function ArrivalsBoard({
   isNight: boolean;
   onPlaneClick: (plane: PaperPlane) => void;
 }) {
-  const boardBg = isNight ? '#0f1a2a' : '#ffffff';
-  const headerBg = isNight ? '#1a2540' : '#2a5a6a';
-  const rowEven = isNight ? '#141e30' : '#f8fafb';
-  const rowOdd = isNight ? '#0f1a2a' : '#ffffff';
-  const borderColor = isNight ? '#1e2e40' : '#e8edf2';
-  const textColor = isNight ? '#c0d0e0' : '#2a3a4a';
+  const boardBg = isNight ? '#0f1520' : '#fffcf8';
+  const headerBg = isNight ? '#1a2540' : '#e87060';
+  const rowEven = isNight ? '#141e30' : '#f5f3ef';
+  const rowOdd = isNight ? '#0f1520' : '#ffffff';
+  const borderColor = isNight ? '#1e2e40' : '#e8e0d4';
+  const textColor = isNight ? '#c0d0e0' : '#1a2a3a';
   const mutedColor = isNight ? '#607080' : '#8090a0';
 
   const sorted = [...planes].sort(
@@ -359,7 +359,7 @@ function ArrivalsBoard({
       {/* Column headers */}
       <div
         className="grid grid-cols-[60px_1fr_56px_40px] px-4 py-2 text-[10px] font-bold tracking-wider uppercase shrink-0"
-        style={{ color: mutedColor, borderBottom: `1px solid ${borderColor}` }}
+        style={{ color: isNight ? mutedColor : '#1a2a3a', background: isNight ? 'transparent' : '#f5f3ef', borderBottom: `1px solid ${borderColor}` }}
       >
         <span>Flight</span>
         <span>From</span>
@@ -547,13 +547,13 @@ function CapacitySelector({
   onChange: (val: number) => void;
   isNight: boolean;
 }) {
-  const trackBg = isNight ? '#1a2540' : '#2a5a6a';
-  const textColor = isNight ? '#a0b8d0' : '#ffffff';
+  const trackBg = isNight ? '#1a2540' : '#e0dcd4';
+  const textColor = isNight ? '#a0b8d0' : '#1a2a3a';
 
   return (
     <div
       className="flex items-center gap-4 px-4 py-2"
-      style={{ background: isNight ? 'rgba(15,26,42,0.9)' : 'rgba(42,90,106,0.85)', backdropFilter: 'blur(4px)' }}
+      style={{ background: isNight ? 'rgba(15,26,42,0.9)' : '#f5f3ef', borderBottom: isNight ? 'none' : '1px solid #e8e0d4' }}
     >
       <span className="text-[11px] font-semibold tracking-wide" style={{ color: textColor }}>
         Terminal Capacity
@@ -567,8 +567,8 @@ function CapacitySelector({
         onChange={(e) => onChange(Number(e.target.value))}
         className="flex-1 h-1.5 rounded-full appearance-none cursor-pointer"
         style={{
-          background: `linear-gradient(to right, #e8c040 0%, #e8c040 ${((capacity - 5) / 45) * 100}%, ${trackBg} ${((capacity - 5) / 45) * 100}%, ${trackBg} 100%)`,
-          accentColor: '#e8c040',
+          background: `linear-gradient(to right, #e87060 0%, #e87060 ${((capacity - 5) / 45) * 100}%, ${trackBg} ${((capacity - 5) / 45) * 100}%, ${trackBg} 100%)`,
+          accentColor: '#e87060',
         }}
       />
       <span className="text-[11px] font-mono font-bold min-w-[60px] text-right" style={{ color: textColor }}>
@@ -727,39 +727,46 @@ export default function AdminRoomPage() {
 
   return (
     <div className="h-screen w-screen relative overflow-hidden select-none flex flex-col">
+      {/* Theme Toggle (fixed top-right, like other pages) */}
+      <div className="theme-toggle" style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       {/* Header Bar */}
       <div
         className="flex items-center gap-3 px-4 py-3 shrink-0 z-20"
-        style={{ background: 'rgba(26,42,58,0.92)', backdropFilter: 'blur(8px)' }}
+        style={{ background: isNight ? 'rgba(26,32,50,0.95)' : 'rgba(255,255,255,0.95)', borderBottom: isNight ? '1px solid #1e2e40' : '1px solid #e8e0d4', boxShadow: isNight ? 'none' : '0 1px 3px rgba(0,0,0,0.05)' }}
       >
         <button
           onClick={() => router.push('/dashboard')}
-          className="text-white/60 hover:text-white transition-colors"
+          style={{ color: isNight ? 'rgba(255,255,255,0.6)' : '#1a2a3a' }}
+          className="hover:opacity-70 transition-opacity"
         >
           <BackIcon />
         </button>
 
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          <h1 className="text-white text-sm font-semibold tracking-wide truncate">
+          <h1 className="text-sm font-semibold tracking-wide truncate" style={{ color: isNight ? '#ffffff' : '#1a2a3a' }}>
             Control Tower
           </h1>
           {room && (
             <>
-              <span className="text-white/30">|</span>
-              <span className="text-white/80 text-xs truncate">{room.name}</span>
-              <span className="text-white/30">|</span>
+              <span style={{ color: isNight ? 'rgba(255,255,255,0.3)' : '#c8bfb0' }}>|</span>
+              <span className="text-xs truncate" style={{ color: isNight ? 'rgba(255,255,255,0.8)' : '#2a5a6a' }}>{room.name}</span>
+              <span style={{ color: isNight ? 'rgba(255,255,255,0.3)' : '#c8bfb0' }}>|</span>
               <button
                 onClick={copyCode}
-                className="flex items-center gap-1 text-white/60 hover:text-white transition-colors"
+                className="flex items-center gap-1 hover:opacity-70 transition-opacity"
+                style={{ color: isNight ? 'rgba(255,255,255,0.6)' : '#1a2a3a' }}
               >
                 <span className="font-mono text-xs tracking-wider">{room.code}</span>
                 <CopyIcon />
               </button>
-              {copied && <span className="text-[10px] text-green-400">Copied</span>}
+              {copied && <span className="text-[10px]" style={{ color: '#4a9a60' }}>Copied</span>}
               <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded font-medium ${
-                room.status === 'active' ? 'bg-green-500/20 text-green-400' :
-                room.status === 'paused' ? 'bg-yellow-500/20 text-yellow-400' :
-                'bg-red-500/20 text-red-400'
+                room.status === 'active' ? 'bg-green-500/20 text-green-600' :
+                room.status === 'paused' ? 'bg-yellow-500/20 text-yellow-600' :
+                'bg-red-500/20 text-red-600'
               }`}>
                 {room.status}
               </span>
@@ -768,19 +775,15 @@ export default function AdminRoomPage() {
         </div>
 
         {room && (
-          <div className="flex items-center gap-1.5 text-white/60 text-xs">
+          <div className="flex items-center gap-1.5 text-xs" style={{ color: isNight ? 'rgba(255,255,255,0.6)' : '#2a5a6a' }}>
             <UsersIcon />
             <span>{room.participantCount}</span>
           </div>
         )}
 
-        <div className="flex items-center gap-1.5 text-white/60 text-xs">
+        <div className="flex items-center gap-1.5 text-xs" style={{ color: isNight ? 'rgba(255,255,255,0.6)' : '#2a5a6a' }}>
           <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
           <span>{planes.length} flights</span>
-        </div>
-
-        <div className="ml-2">
-          <ThemeToggle />
         </div>
       </div>
 
@@ -866,7 +869,7 @@ export default function AdminRoomPage() {
         </div>
 
         {/* RIGHT: Arrivals Board (40%) */}
-        <div className="w-[40%] h-full border-l" style={{ borderColor: isNight ? '#1e2e40' : '#d0dae0' }}>
+        <div className="w-[40%] h-full border-l" style={{ borderColor: isNight ? '#1e2e40' : '#e8e0d4' }}>
           <ArrivalsBoard
             planes={planes}
             readIds={readIds}
