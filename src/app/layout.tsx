@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Noto_Serif_JP, Inter } from 'next/font/google';
 import './globals.css';
 import { Providers } from './providers';
+import { ThemeProvider } from './theme-provider';
 
 const notoSerif = Noto_Serif_JP({
   subsets: ['latin'],
@@ -17,14 +18,16 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: 'Paper Plane',
-  description: 'Send anonymous questions as paper planes — Modern ZEN x Bangkok Mood',
+  description: 'Send anonymous questions as paper planes — Modern ZEN x Bangkok',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="ja" className={`${notoSerif.variable} ${inter.variable}`}>
+    <html lang="en" className={`${notoSerif.variable} ${inter.variable}`}>
       <body className="min-h-screen antialiased">
-        <Providers>{children}</Providers>
+        <Providers>
+          <ThemeProvider>{children}</ThemeProvider>
+        </Providers>
       </body>
     </html>
   );
