@@ -131,6 +131,8 @@ function CreateBg() {
 export default function CreateRoomPage() {
   const [name, setName] = useState('');
   const [identityMode, setIdentityMode] = useState<'anonymous' | 'identified'>('anonymous');
+  const [mode, setMode] = useState<'direct' | 'exchange'>('direct');
+  const [revealSenders, setRevealSenders] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
   const { userId } = useUserStore();
@@ -159,6 +161,8 @@ export default function CreateRoomPage() {
     createMutation.mutate({
       name: name.trim(),
       identityMode,
+      mode,
+      revealSenders,
       ownerId: userId,
     });
   };
@@ -249,6 +253,65 @@ export default function CreateRoomPage() {
                   : 'Passengers must provide their name at the gate'}
               </p>
             </div>
+
+            {/* Room Mode */}
+            <div>
+              <label className="block fids-font text-[10px] uppercase tracking-widest font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>Room Mode</label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setMode('direct')}
+                  className="flex-1 p-4 rounded-xl text-center transition-all border-2"
+                  style={{
+                    background: mode === 'direct' ? 'rgba(42,90,106,0.1)' : 'transparent',
+                    borderColor: mode === 'direct' ? 'var(--teal)' : 'var(--border)',
+                    color: mode === 'direct' ? 'var(--teal)' : 'var(--ink)',
+                  }}
+                >
+                  <p className="text-sm font-semibold">Direct to Admin</p>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Messages go to control tower</p>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setMode('exchange')}
+                  className="flex-1 p-4 rounded-xl text-center transition-all border-2"
+                  style={{
+                    background: mode === 'exchange' ? 'rgba(232,112,96,0.1)' : 'transparent',
+                    borderColor: mode === 'exchange' ? '#e87060' : 'var(--border)',
+                    color: mode === 'exchange' ? '#e87060' : 'var(--ink)',
+                  }}
+                >
+                  <p className="text-sm font-semibold">Random Exchange</p>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Shuffled between participants</p>
+                </button>
+              </div>
+              <p className="text-[10px] mt-2" style={{ color: 'var(--ink-muted)' }}>
+                {mode === 'direct'
+                  ? 'Messages fly directly to the control tower for the admin to manage'
+                  : 'Participants write messages, then admin dispatches them randomly -- no one gets their own'}
+              </p>
+            </div>
+
+            {/* Reveal Senders (exchange mode only) */}
+            {mode === 'exchange' && (
+              <div className="flex items-center justify-between p-4 rounded-xl border-2" style={{ borderColor: 'var(--border)' }}>
+                <div>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Reveal Senders</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'var(--ink-muted)' }}>Show who wrote each message after dispatch</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setRevealSenders(!revealSenders)}
+                  className="relative w-11 h-6 rounded-full transition-colors"
+                  style={{ background: revealSenders ? '#e87060' : 'var(--border)' }}
+                >
+                  <span
+                    className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform shadow-sm"
+                    style={{ transform: revealSenders ? 'translateX(20px)' : 'translateX(0)' }}
+                  />
+                </button>
+              </div>
+            )}
 
             {error && (
               <p className="text-xs" style={{ color: 'var(--error)' }}>

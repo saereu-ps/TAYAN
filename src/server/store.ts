@@ -15,9 +15,24 @@ export interface Room {
   code: string;
   status: 'active' | 'paused' | 'closed';
   identityMode: 'anonymous' | 'identified';
+  mode: 'direct' | 'exchange';
+  revealSenders: boolean;
   ownerId: string;
   participantCount: number;
   createdAt: string;
+}
+
+export interface ExchangeSubmission {
+  participantId: string;
+  participantName: string;
+  content: string;
+  submittedAt: string;
+}
+
+export interface ExchangeResult {
+  recipientId: string;
+  message: string;
+  senderName: string;
 }
 
 export interface PaperPlane {
@@ -41,14 +56,22 @@ if (!g.__paperPlaneStore) {
     rooms: new Map<string, Room>(),
     planes: new Map<string, PaperPlane>(),
     roomCodeIndex: new Map<string, string>(),
+    exchanges: new Map<string, ExchangeSubmission[]>(),
+    exchangeResults: new Map<string, ExchangeResult[]>(),
     counter: 0,
   };
+}
+if (!g.__paperPlaneStore.exchanges) {
+  g.__paperPlaneStore.exchanges = new Map<string, ExchangeSubmission[]>();
+  g.__paperPlaneStore.exchangeResults = new Map<string, ExchangeResult[]>();
 }
 
 export const users: Map<string, User> = g.__paperPlaneStore.users;
 export const rooms: Map<string, Room> = g.__paperPlaneStore.rooms;
 export const planes: Map<string, PaperPlane> = g.__paperPlaneStore.planes;
 export const roomCodeIndex: Map<string, string> = g.__paperPlaneStore.roomCodeIndex;
+export const exchanges: Map<string, ExchangeSubmission[]> = g.__paperPlaneStore.exchanges;
+export const exchangeResults: Map<string, ExchangeResult[]> = g.__paperPlaneStore.exchangeResults;
 
 // --- Rate Limiter ---
 const rateLimits = new Map<string, { count: number; resetAt: number }>();

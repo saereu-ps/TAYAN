@@ -132,6 +132,7 @@ export default function ParticipantRoomPage() {
   const [showSent, setShowSent] = useState(false);
   const [error, setError] = useState('');
   const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+  const [exchangeSubmitted, setExchangeSubmitted] = useState(false);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const roomQuery = trpc.room.getByCode.useQuery({ code }, { enabled: !joined, retry: false });
@@ -157,6 +158,22 @@ export default function ParticipantRoomPage() {
     { enabled: joined && !!(roomQuery.data?.id || joinMutation.data?.room.id), refetchInterval: 2000 },
   );
 
+  // Exchange mode hooks
+  const roomId = roomQuery.data?.id || joinMutation.data?.room.id || '';
+  const roomMode = roomQuery.data?.mode || joinMutation.data?.room.mode;
+  const exchangeStatusQuery = trpc.exchange.getStatus.useQuery(
+    { roomId },
+    { enabled: joined && !!roomId && roomMode === 'exchange', refetchInterval: 2000 },
+  );
+  const exchangeSubmitMutation = trpc.exchange.submit.useMutation({
+    onSuccess: () => { setExchangeSubmitted(true); setMessage(''); },
+    onError: (err) => setError(err.message),
+  });
+  const myMessageQuery = trpc.exchange.getMyMessage.useQuery(
+    { roomId, participantId: sessionId },
+    { enabled: joined && !!roomId && !!sessionId && exchangeSubmitted && roomMode === 'exchange', refetchInterval: 3000 },
+  );
+
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
     const room = roomQuery.data;
@@ -168,10 +185,22 @@ export default function ParticipantRoomPage() {
 
   const handleSend = () => {
     if (!message.trim() || isSending) return;
-    const roomId = roomQuery.data?.id || joinMutation.data?.room.id;
-    if (!roomId) return;
+    const currentRoomId = roomQuery.data?.id || joinMutation.data?.room.id;
+    if (!currentRoomId) return;
     setIsSending(true);
-    sendMutation.mutate({ roomId, content: message.trim(), senderName: name || undefined, senderSessionId: sessionId });
+    sendMutation.mutate({ roomId: currentRoomId, content: message.trim(), senderName: name || undefined, senderSessionId: sessionId });
+  };
+
+  const handleExchangeSubmit = () => {
+    if (!message.trim()) return;
+    const currentRoomId = roomQuery.data?.id || joinMutation.data?.room.id;
+    if (!currentRoomId) return;
+    exchangeSubmitMutation.mutate({
+      roomId: currentRoomId,
+      participantId: sessionId,
+      participantName: name || undefined,
+      content: message.trim(),
+    });
   };
 
   const toggleExpand = (id: string) => {
@@ -265,6 +294,193 @@ export default function ParticipantRoomPage() {
   }
 
   // --- MAIN ROOM VIEW ---
+  // Exchange mode
+  if (room?.mode === 'exchange') {
+    const receivedMessage = myMessageQuery.data;
+    const exchangeStatus = exchangeStatusQuery.data;
+
+    return (
+      <div className="min-h-screen flex flex-col relative overflow-hidden">
+        <TerminalWindowBg />
+        <ThemeToggle />
+
+        {/* Home button */}
+        <button
+          onClick={() => router.push('/')}
+          className="fixed top-5 left-5 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all"
+          style={{ background: 'var(--bg-card, rgba(255,255,255,0.95))', border: '1px solid var(--border, #e8e0d4)', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}
+          title="Home"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </button>
+
+        {/* Header */}
+        <div className="relative z-10 px-6 py-4 border-b" style={{ borderColor: 'var(--border)', background: 'var(--bg-card)' }}>
+          <div className="max-w-2xl mx-auto flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-3">
+                <span className="fids-font text-[10px] uppercase tracking-widest px-2.5 py-1 rounded-md font-bold" style={{ color: '#fff', background: '#e87060' }}>
+                  Exchange
+                </span>
+                <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-muted)' }}>Random Mode</span>
+              </div>
+              <h1 className="heading text-lg font-semibold mt-1">{room?.name}</h1>
+            </div>
+            <div className="text-right">
+              <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>
+                {name ? `Passenger: ${name}` : 'Anonymous Passenger'}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Exchange Content */}
+        <div className="flex-1 flex items-center justify-center px-6 py-8 relative z-10">
+          <div className="w-full max-w-md">
+            {/* Phase 1: Write */}
+            {!exchangeSubmitted && !receivedMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="space-y-4"
+              >
+                <div className="text-center mb-6">
+                  <h2 className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Write your message for someone random</h2>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>
+                    Your message will be shuffled and delivered to another participant
+                  </p>
+                </div>
+
+                <div className="card-paper">
+                  <textarea
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    placeholder="Write something meaningful..."
+                    rows={6}
+                    maxLength={500}
+                    className="w-full bg-transparent resize-none outline-none text-sm leading-relaxed"
+                    style={{ color: 'var(--ink)' }}
+                    autoFocus
+                  />
+                  <div className="flex items-center justify-between mt-3">
+                    <span className="text-[10px] fids-font" style={{ color: 'var(--ink-muted)' }}>{message.length}/500</span>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleExchangeSubmit}
+                  disabled={!message.trim() || exchangeSubmitMutation.isPending}
+                  className="btn-takeoff w-full"
+                >
+                  <span>{exchangeSubmitMutation.isPending ? 'Submitting...' : 'Submit Message'}</span>
+                  <SmallPlaneIcon size={18} />
+                </button>
+
+                {error && <p className="text-xs text-center" style={{ color: 'var(--error)' }}>{error}</p>}
+              </motion.div>
+            )}
+
+            {/* Phase 2: Waiting */}
+            {exchangeSubmitted && !receivedMessage && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="text-center space-y-6"
+              >
+                <motion.div
+                  animate={{ rotate: [0, 360] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: 'linear' }}
+                  className="inline-block"
+                >
+                  <svg width="64" height="64" viewBox="0 0 64 64" fill="none">
+                    <circle cx="32" cy="32" r="28" stroke="var(--border)" strokeWidth="2" strokeDasharray="4 4" />
+                    <g transform="translate(20, 24)">
+                      <path d="M22 4H16L12 0H10L12 4H6L4 2H2L4 6L2 10H4L6 8H12L10 12H12L16 8H22C23 8 24 7.5 24 6C24 4.5 23 4 22 4Z" fill="var(--ink)" opacity="0.6"/>
+                    </g>
+                  </svg>
+                </motion.div>
+
+                <div>
+                  <h2 className="text-sm font-semibold" style={{ color: 'var(--ink)' }}>Message submitted</h2>
+                  <p className="text-xs mt-2" style={{ color: 'var(--ink-muted)' }}>
+                    Waiting for Control Tower to dispatch...
+                  </p>
+                </div>
+
+                {exchangeStatus && (
+                  <div className="rounded-xl p-4" style={{ background: 'var(--bg-card)', border: '1px solid var(--border)' }}>
+                    <p className="text-xs font-mono" style={{ color: 'var(--ink-muted)' }}>
+                      {exchangeStatus.totalSubmitted} / {exchangeStatus.totalParticipants} messages submitted
+                    </p>
+                    <div className="w-full h-1.5 rounded-full mt-2 overflow-hidden" style={{ background: 'var(--border)' }}>
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: exchangeStatus.totalParticipants ? `${Math.min(100, (exchangeStatus.totalSubmitted / exchangeStatus.totalParticipants) * 100)}%` : '0%',
+                          background: '#e87060',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* Phase 3: Received */}
+            {receivedMessage && (
+              <motion.div
+                initial={{ opacity: 0, y: 40, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                className="space-y-4"
+              >
+                <div className="text-center mb-4">
+                  <motion.div
+                    initial={{ y: -30, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    transition={{ delay: 0.3, type: 'spring' }}
+                  >
+                    <AirplaneIcon size={100} />
+                  </motion.div>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.6 }}
+                    className="text-xs mt-3 font-medium"
+                    style={{ color: 'var(--ink-muted)' }}
+                  >
+                    A message has arrived for you
+                  </motion.p>
+                </div>
+
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.8 }}
+                  className="rounded-2xl p-6 shadow-lg"
+                  style={{ background: 'var(--bg-card)', border: '2px solid var(--border)' }}
+                >
+                  <p className="text-sm leading-relaxed" style={{ color: 'var(--ink)' }}>
+                    {receivedMessage.message}
+                  </p>
+                  {receivedMessage.senderName && (
+                    <p className="text-[10px] mt-4 pt-3" style={{ color: 'var(--ink-muted)', borderTop: '1px solid var(--border)' }}>
+                      From: {receivedMessage.senderName}
+                    </p>
+                  )}
+                </motion.div>
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- DIRECT MODE ROOM VIEW ---
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <TerminalWindowBg />

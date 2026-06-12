@@ -578,6 +578,115 @@ function CapacitySelector({
   );
 }
 
+// --- Exchange Admin Panel ---
+function ExchangeAdminPanel({ roomId, isNight }: { roomId: string; isNight: boolean }) {
+  const utils = trpc.useUtils();
+  const statusQuery = trpc.exchange.getStatus.useQuery(
+    { roomId },
+    { refetchInterval: 2000 },
+  );
+  const dispatchMutation = trpc.exchange.dispatch.useMutation({
+    onSuccess: () => utils.exchange.getStatus.invalidate({ roomId }),
+  });
+  const resetMutation = trpc.exchange.reset.useMutation({
+    onSuccess: () => utils.exchange.getStatus.invalidate({ roomId }),
+  });
+
+  const status = statusQuery.data;
+  const bgColor = isNight ? '#0f1520' : '#fffcf8';
+  const cardBg = isNight ? '#1a2540' : '#f5f3ef';
+  const textColor = isNight ? '#c0d0e0' : '#1a2a3a';
+  const mutedColor = isNight ? '#607080' : '#8090a0';
+
+  return (
+    <div className="flex-1 flex items-center justify-center p-8" style={{ background: bgColor }}>
+      <div className="w-full max-w-md space-y-6">
+        {/* Status Card */}
+        <div className="rounded-2xl p-6" style={{ background: cardBg }}>
+          <div className="flex items-center gap-2 mb-4">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={isNight ? '#e87060' : '#e87060'} strokeWidth="2" strokeLinecap="round">
+              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+            </svg>
+            <h2 className="text-sm font-semibold tracking-wide" style={{ color: textColor }}>Random Exchange</h2>
+          </div>
+
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: mutedColor }}>Submissions ready</span>
+              <span className="text-lg font-bold font-mono" style={{ color: '#e87060' }}>
+                {status?.totalSubmitted ?? 0}
+              </span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-xs" style={{ color: mutedColor }}>Participants joined</span>
+              <span className="text-lg font-bold font-mono" style={{ color: textColor }}>
+                {status?.totalParticipants ?? 0}
+              </span>
+            </div>
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: isNight ? '#0a0f1a' : '#e0dcd4' }}>
+              <div
+                className="h-full rounded-full transition-all duration-500"
+                style={{
+                  width: status?.totalParticipants ? `${Math.min(100, (status.totalSubmitted / status.totalParticipants) * 100)}%` : '0%',
+                  background: '#e87060',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Dispatch Status */}
+        {status?.isDispatched && (
+          <div className="rounded-2xl p-6 text-center" style={{ background: 'rgba(74,154,96,0.1)', border: '2px solid rgba(74,154,96,0.3)' }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#4a9a60" strokeWidth="2" strokeLinecap="round" className="mx-auto mb-2">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+            <p className="text-sm font-semibold" style={{ color: '#4a9a60' }}>Dispatched</p>
+            <p className="text-xs mt-1" style={{ color: mutedColor }}>
+              {status.totalSubmitted} messages distributed to participants
+            </p>
+          </div>
+        )}
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          {!status?.isDispatched && (
+            <button
+              onClick={() => dispatchMutation.mutate({ roomId })}
+              disabled={dispatchMutation.isPending || (status?.totalSubmitted ?? 0) < 2}
+              className="w-full py-4 rounded-xl text-white font-semibold text-sm tracking-wide transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              style={{ background: '#e87060', boxShadow: '0 4px 14px rgba(232,112,96,0.4)' }}
+            >
+              {dispatchMutation.isPending ? 'Dispatching...' : 'Dispatch Messages'}
+            </button>
+          )}
+
+          {(status?.totalSubmitted ?? 0) < 2 && !status?.isDispatched && (
+            <p className="text-[10px] text-center" style={{ color: mutedColor }}>
+              Need at least 2 submissions to dispatch
+            </p>
+          )}
+
+          <button
+            onClick={() => resetMutation.mutate({ roomId })}
+            disabled={resetMutation.isPending}
+            className="w-full py-3 rounded-xl text-sm font-medium transition-all border-2"
+            style={{ borderColor: isNight ? '#2a3a5a' : '#e0dcd4', color: mutedColor, background: 'transparent' }}
+          >
+            {resetMutation.isPending ? 'Resetting...' : 'Reset Round'}
+          </button>
+        </div>
+
+        {dispatchMutation.isError && (
+          <p className="text-xs text-center" style={{ color: '#e87060' }}>
+            {dispatchMutation.error.message}
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // --- Main Page Component ---
 export default function AdminRoomPage() {
   const router = useRouter();
@@ -792,9 +901,14 @@ export default function AdminRoomPage() {
 
       {/* Main Content: Two panels */}
       <div className="flex flex-1 min-h-0">
-        {/* LEFT: Airport Tarmac View (60%) */}
-        <div className="relative w-[60%] h-full overflow-hidden">
-          <TarmacLayout isNight={isNight} gates={gates} capacity={capacity} />
+        {/* EXCHANGE MODE: Show exchange controls */}
+        {room?.mode === 'exchange' ? (
+          <ExchangeAdminPanel roomId={roomId} isNight={isNight} />
+        ) : (
+          <>
+            {/* LEFT: Airport Tarmac View (60%) */}
+            <div className="relative w-[60%] h-full overflow-hidden">
+              <TarmacLayout isNight={isNight} gates={gates} capacity={capacity} />
 
           {/* Planes on the tarmac */}
           <div className="absolute inset-0 z-10">
@@ -877,6 +991,8 @@ export default function AdminRoomPage() {
             onPlaneClick={handlePlaneClick}
           />
         </div>
+          </>
+        )}
       </div>
 
       {/* Message Modal */}

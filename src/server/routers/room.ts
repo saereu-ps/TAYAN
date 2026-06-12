@@ -10,6 +10,8 @@ export const roomRouter = router({
         name: z.string().min(1).max(100),
         description: z.string().max(500).optional(),
         identityMode: z.enum(['anonymous', 'identified']),
+        mode: z.enum(['direct', 'exchange']).default('direct'),
+        revealSenders: z.boolean().default(false),
         ownerId: z.string(),
       }),
     )
@@ -30,6 +32,8 @@ export const roomRouter = router({
         code,
         status: 'active' as const,
         identityMode: input.identityMode,
+        mode: input.mode,
+        revealSenders: input.revealSenders,
         ownerId: input.ownerId,
         participantCount: 0,
         createdAt: new Date().toISOString(),
