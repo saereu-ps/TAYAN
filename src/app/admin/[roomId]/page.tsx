@@ -5,27 +5,49 @@ import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
-import { ThemeToggle } from '../../theme-provider';
+import { ThemeToggle, useTheme } from '../../theme-provider';
 
-function AirplaneIcon({ size = 64 }: { size?: number }) {
+function AirplaneIcon({ size = 120 }: { size?: number }) {
   return (
-    <svg width={size} height={size * 0.5} viewBox="0 0 120 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="65" cy="28" rx="48" ry="9" fill="#f0ebe0"/>
-      <path d="M17 28 C17 34 40 37 65 37 C90 37 113 34 113 28" fill="#2a5a6a" opacity="0.9"/>
-      <path d="M50 32 L38 52 L82 52 L72 32Z" fill="#2a5a6a"/>
-      <path d="M18 28 L10 12 L24 14 L22 28Z" fill="#2a5a6a"/>
-      <path d="M18 22 L14 16 L22 17Z" fill="#f0ebe0"/>
-      <ellipse cx="52" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
-      <ellipse cx="72" cy="44" rx="5" ry="3.5" fill="#3a6a7a"/>
-      <g fill="#5b9bd5">
-        <rect x="35" y="25" width="3" height="4" rx="1.5"/>
-        <rect x="49" y="25" width="3" height="4" rx="1.5"/>
-        <rect x="63" y="25" width="3" height="4" rx="1.5"/>
-        <rect x="77" y="25" width="3" height="4" rx="1.5"/>
-        <rect x="91" y="25" width="3" height="4" rx="1.5"/>
+    <svg width={size} height={size * 0.5} viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 48 Q30 38 60 36 L170 36 Q185 36 192 42 Q198 48 192 54 Q185 60 170 60 L60 60 Q30 58 20 48Z" fill="#f0ebe0"/>
+      <path d="M30 52 Q60 62 120 62 Q160 62 185 56 Q190 54 188 52 L170 60 L60 60 Q35 58 30 52Z" fill="#d4d0c8" opacity="0.5"/>
+      <path d="M40 46 L180 46 L180 48 L40 48Z" fill="#4b2d8e"/>
+      <path d="M40 48 L180 48 L180 49 L40 49Z" fill="#c4a44e"/>
+      <path d="M28 48 L20 20 L40 22 L42 40Z" fill="#4b2d8e"/>
+      <path d="M24 30 L36 32 L36 34 L25 33Z" fill="#c4a44e"/>
+      <path d="M22 46 L10 38 L18 37 L30 44Z" fill="#d8d4cc"/>
+      <path d="M22 50 L10 58 L18 59 L30 52Z" fill="#d8d4cc"/>
+      <path d="M80 55 L65 88 L130 88 L115 55Z" fill="#c8c4bc"/>
+      <path d="M80 52 L68 80 L125 80 L112 52Z" fill="#d8d4cc"/>
+      <ellipse cx="88" cy="82" rx="7" ry="5" fill="#8a8680"/>
+      <ellipse cx="88" cy="82" rx="4.5" ry="3" fill="#3a3a3a"/>
+      <ellipse cx="112" cy="82" rx="7" ry="5" fill="#8a8680"/>
+      <ellipse cx="112" cy="82" rx="4.5" ry="3" fill="#3a3a3a"/>
+      <path d="M182 40 Q190 44 190 48 Q190 52 182 56" fill="#5a9ad5" opacity="0.7"/>
+      <path d="M183 42 Q188 45 188 48 Q188 51 183 54" fill="#3a7ab5" opacity="0.5"/>
+      <g fill="#5b9bd5" opacity="0.6">
+        <rect x="55" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="62" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="69" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="76" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="83" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="90" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="97" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="104" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="111" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="118" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="125" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="132" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="139" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="146" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="153" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="160" y="42" width="3" height="5" rx="1.5"/>
+        <rect x="167" y="42" width="3" height="5" rx="1.5"/>
       </g>
-      <path d="M108 24 Q113 28 108 32" fill="#4a9aba" opacity="0.8"/>
-      <ellipse cx="112" cy="28" rx="4" ry="8" fill="#f0ebe0"/>
+      <line x1="52" y1="37" x2="52" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
+      <line x1="100" y1="37" x2="100" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
+      <line x1="150" y1="37" x2="150" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
     </svg>
   );
 }
@@ -94,32 +116,54 @@ function UsersIcon() {
 }
 
 function RadarBg() {
+  const { theme } = useTheme();
+  const isNight = theme === 'night';
+
+  const skyColor = isNight ? '#1a2040' : '#4a8ac5';
+  const radarStroke = isNight ? '#4a5a7a' : '#f0ebe0';
+  const blipColor = isNight ? '#4a5a7a' : '#f0ebe0';
+
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Deeper sky */}
-        <rect width="1200" height="800" fill="#4a8ac5"/>
+        <rect width="1200" height="800" fill={skyColor}/>
 
-        {/* Concentric radar circles in cream */}
-        <circle cx="600" cy="400" r="100" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="200" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="300" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="400" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="500" stroke="#f0ebe0" strokeWidth="1" fill="none" opacity="0.15"/>
+        {/* Stars (night only) */}
+        {isNight && (
+          <g>
+            <circle cx="80" cy="50" r="1" fill="#ffffff" opacity="0.4"/>
+            <circle cx="200" cy="80" r="1.5" fill="#ffffff" opacity="0.5"/>
+            <circle cx="350" cy="40" r="1" fill="#ffffff" opacity="0.3"/>
+            <circle cx="500" cy="70" r="2" fill="#ffffff" opacity="0.4"/>
+            <circle cx="700" cy="50" r="1.5" fill="#ffffff" opacity="0.6"/>
+            <circle cx="900" cy="80" r="1" fill="#ffffff" opacity="0.5"/>
+            <circle cx="1050" cy="60" r="2" fill="#ffffff" opacity="0.3"/>
+            <circle cx="1150" cy="90" r="1" fill="#ffffff" opacity="0.4"/>
+            <circle cx="150" cy="150" r="1.5" fill="#ffffff" opacity="0.3"/>
+            <circle cx="1000" cy="150" r="1" fill="#ffffff" opacity="0.5"/>
+          </g>
+        )}
+
+        {/* Concentric radar circles */}
+        <circle cx="600" cy="400" r="100" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="200" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="300" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="400" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
+        <circle cx="600" cy="400" r="500" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
 
         {/* Crosshairs */}
-        <line x1="600" y1="0" x2="600" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.1"/>
-        <line x1="0" y1="400" x2="1200" y2="400" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.1"/>
-        <line x1="175" y1="0" x2="1025" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.08"/>
-        <line x1="1025" y1="0" x2="175" y2="800" stroke="#f0ebe0" strokeWidth="0.5" opacity="0.08"/>
+        <line x1="600" y1="0" x2="600" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.1"/>
+        <line x1="0" y1="400" x2="1200" y2="400" stroke={radarStroke} strokeWidth="0.5" opacity="0.1"/>
+        <line x1="175" y1="0" x2="1025" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.08"/>
+        <line x1="1025" y1="0" x2="175" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.08"/>
 
         {/* Radar blips */}
-        <circle cx="450" cy="250" r="4" fill="#f0ebe0" opacity="0.25"/>
-        <circle cx="750" cy="320" r="3" fill="#f0ebe0" opacity="0.2"/>
-        <circle cx="380" cy="500" r="3" fill="#f0ebe0" opacity="0.2"/>
-        <circle cx="820" cy="480" r="4" fill="#f0ebe0" opacity="0.25"/>
-        <circle cx="550" cy="180" r="2.5" fill="#f0ebe0" opacity="0.18"/>
-        <circle cx="700" cy="600" r="3" fill="#f0ebe0" opacity="0.2"/>
+        <circle cx="450" cy="250" r="4" fill={blipColor} opacity="0.25"/>
+        <circle cx="750" cy="320" r="3" fill={blipColor} opacity="0.2"/>
+        <circle cx="380" cy="500" r="3" fill={blipColor} opacity="0.2"/>
+        <circle cx="820" cy="480" r="4" fill={blipColor} opacity="0.25"/>
+        <circle cx="550" cy="180" r="2.5" fill={blipColor} opacity="0.18"/>
+        <circle cx="700" cy="600" r="3" fill={blipColor} opacity="0.2"/>
       </svg>
     </div>
   );
@@ -205,7 +249,7 @@ export default function AdminRoomPage() {
       <ThemeToggle />
 
       <div className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
-        {/* Header — Control Tower */}
+        {/* Header */}
         <div className="flex items-start gap-4 mb-8">
           <button
             onClick={() => router.push('/dashboard')}
@@ -257,7 +301,7 @@ export default function AdminRoomPage() {
         {planes.length === 0 ? (
           <div className="card text-center py-16">
             <div className="opacity-20 mb-4 flex justify-center">
-              <AirplaneIcon size={56} />
+              <AirplaneIcon size={100} />
             </div>
             <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Airspace clear -- no incoming flights</p>
             <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>
@@ -307,7 +351,6 @@ export default function AdminRoomPage() {
                     <p className="text-sm mb-4 leading-relaxed">{plane.content}</p>
 
                     <div className="flex items-center gap-1.5">
-                      {/* Broadcast (coral fill) */}
                       <button
                         onClick={() =>
                           plane.isBroadcasted
@@ -320,7 +363,6 @@ export default function AdminRoomPage() {
                         <BroadcastIcon />
                         <span>{plane.isBroadcasted ? 'On Air' : 'Broadcast'}</span>
                       </button>
-                      {/* Pin (orange outline) */}
                       <button
                         onClick={() => pinMutation.mutate({ planeId: plane.id })}
                         className={`btn-atc-hold ${plane.isPinned ? 'active' : ''}`}
@@ -329,7 +371,6 @@ export default function AdminRoomPage() {
                         <PinIcon />
                         <span>Pin</span>
                       </button>
-                      {/* Remove (dark outline) */}
                       <button
                         onClick={() => removeMutation.mutate({ planeId: plane.id })}
                         className="btn-atc-reject"

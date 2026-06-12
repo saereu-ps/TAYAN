@@ -23,19 +23,25 @@
 }
 
 .dark {
-  --bg: #1a2a3a;
-  --bg-deep: #141e2a;
+  --bg: #1a2040;
+  --bg-deep: #141828;
   --bg-card: rgba(42,58,74,0.95);
   --ink: #f0ebe0;
   --ink-muted: #8aa0b8;
   --accent: #e89070;
   --accent-hover: #d07060;
   --orange: #d08050;
-  --sun: #d4c880;
-  --cloud: #3a5060;
+  --sun: #f0e8d0;
+  --cloud: #2a3a5a;
+  --cloud-highlight: #3a4a6a;
   --teal: #4a8a9a;
   --cream: #2a4050;
-  --plum: #2a1828;
+  --plum: #3a2040;
+  --plum-deep: #2a1a30;
+  --contrail: #4a5a7a;
+  --sky: #1a2040;
+  --bottom-cloud: #3a2040;
+  --bottom-cloud-dark: #2a1a30;
   --border: rgba(255,255,255,0.1);
   --shadow: rgba(0,0,0,0.3);
   --error: #f87171;
