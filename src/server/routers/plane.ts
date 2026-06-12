@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { TRPCError } from '@trpc/server';
 import { router, publicProcedure } from '../trpc';
-import { planes, rooms, genId } from '../store';
+import { planes, rooms, genId, checkRateLimit } from '../store';
 import type { PaperPlane } from '../store';
 
 export const planeRouter = router({
@@ -20,11 +20,24 @@ export const planeRouter = router({
       if (room.status !== 'active')
         throw new TRPCError({ code: 'BAD_REQUEST', message: 'Room is not active' });
 
+      // Rate limiting
+      if (!checkRateLimit(`send:${input.senderSessionId}`, 10, 60000)) {
+        throw new Error('Too many messages. Please wait a moment.');
+      }
+
+      // Input sanitization
+      const sanitizedContent = input.content
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .trim()
+        .slice(0, 500);
+
       const id = genId();
       const plane: PaperPlane = {
         id,
         roomId: input.roomId,
-        content: input.content.trim(),
+        content: sanitizedContent,
         senderName: input.senderName,
         senderSessionId: input.senderSessionId,
         status: 'active',

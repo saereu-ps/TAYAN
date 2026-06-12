@@ -238,10 +238,13 @@ export default function LandingPage() {
           <AirplaneIcon size={160} />
         </motion.div>
 
-        <h1 className="heading text-4xl font-bold mb-2 text-white drop-shadow-md">
+        <h1
+          className="heading text-5xl md:text-7xl font-black tracking-[0.15em] mb-2 text-white drop-shadow-md"
+          style={{ textShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+        >
           TAYAN
         </h1>
-        <p className="text-sm mb-10 text-white/80">
+        <p className="text-base mb-10 text-white/80">
           Your thoughts take flight
         </p>
 

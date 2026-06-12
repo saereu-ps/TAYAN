@@ -50,6 +50,23 @@ export const rooms: Map<string, Room> = g.__paperPlaneStore.rooms;
 export const planes: Map<string, PaperPlane> = g.__paperPlaneStore.planes;
 export const roomCodeIndex: Map<string, string> = g.__paperPlaneStore.roomCodeIndex;
 
+// --- Rate Limiter ---
+const rateLimits = new Map<string, { count: number; resetAt: number }>();
+
+export function checkRateLimit(key: string, maxRequests: number = 10, windowMs: number = 60000): boolean {
+  const now = Date.now();
+  const entry = rateLimits.get(key);
+  if (!entry || now > entry.resetAt) {
+    rateLimits.set(key, { count: 1, resetAt: now + windowMs });
+    return true;
+  }
+  if (entry.count >= maxRequests) {
+    return false;
+  }
+  entry.count++;
+  return true;
+}
+
 // --- Helpers ---
 export function genId(): string {
   g.__paperPlaneStore.counter++;
