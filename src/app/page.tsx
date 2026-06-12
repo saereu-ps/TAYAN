@@ -7,75 +7,115 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from './theme-provider';
 
-function PlaneIcon({ size = 64 }: { size?: number }) {
+function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 32L56 8L40 56L30 36L4 32Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 36L56 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-      <path d="M30 36V50L38 42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
     </svg>
   );
 }
 
-function BangkokSkylineBg() {
+function AirportBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
-        {/* Chao Phraya River */}
-        <path d="M0 650 Q200 630 400 660 Q600 690 800 655 Q1000 620 1200 650 L1200 800 L0 800Z" stroke="currentColor" strokeWidth="0.5" opacity="0.08" fill="none"/>
-        <path d="M0 670 Q300 650 500 680 Q700 710 900 675 Q1100 640 1200 670" stroke="currentColor" strokeWidth="0.3" opacity="0.06" fill="none"/>
-        <path d="M0 685 Q250 670 450 695 Q650 720 850 690 Q1050 660 1200 685" stroke="currentColor" strokeWidth="0.3" opacity="0.04" fill="none"/>
-
-        {/* Wat Arun silhouette */}
-        <g opacity="0.1" stroke="currentColor" strokeWidth="0.8" fill="none">
-          <path d="M280 650 L280 520 L290 480 L295 440 L300 400 L300 380 L300 360 L298 340 L300 320 L302 340 L300 360 L300 380 L300 400 L305 440 L310 480 L320 520 L320 650"/>
-          <path d="M260 650 L265 560 L275 530 L280 520"/>
-          <path d="M320 520 L325 530 L335 560 L340 650"/>
-          {/* Prang tiers */}
-          <path d="M285 480 L315 480"/>
-          <path d="M288 440 L312 440"/>
-          <path d="M293 400 L307 400"/>
-          {/* Small prangs */}
-          <path d="M230 650 L230 580 L235 560 L237 545 L235 560 L240 580 L240 650"/>
-          <path d="M360 650 L360 580 L365 560 L367 545 L365 560 L370 580 L370 650"/>
+        {/* Runway in perspective */}
+        <g opacity="0.18">
+          <path d="M400 800 L500 450 L700 450 L800 800Z" fill="rgba(90,154,207,0.15)" stroke="#5a9acf" strokeWidth="1.5"/>
+          {/* Center line dashes */}
+          <line x1="600" y1="800" x2="600" y2="460" stroke="#e8c840" strokeWidth="2.5" strokeDasharray="30 20"/>
+          {/* Threshold stripes */}
+          <line x1="480" y1="780" x2="520" y2="500" stroke="rgba(232,200,64,0.7)" strokeWidth="4"/>
+          <line x1="530" y1="780" x2="555" y2="500" stroke="rgba(232,200,64,0.7)" strokeWidth="4"/>
+          <line x1="670" y1="780" x2="645" y2="500" stroke="rgba(232,200,64,0.7)" strokeWidth="4"/>
+          <line x1="720" y1="780" x2="680" y2="500" stroke="rgba(232,200,64,0.7)" strokeWidth="4"/>
         </g>
 
-        {/* Temple spires scattered */}
-        <g opacity="0.07" stroke="currentColor" strokeWidth="0.6" fill="none">
-          <path d="M600 650 L600 580 L605 550 L607 530 L605 550 L610 580 L610 650"/>
-          <path d="M595 580 L615 580"/>
-          <path d="M800 650 L800 590 L803 570 L805 555 L803 570 L806 590 L806 650"/>
-          <path d="M150 650 L150 600 L153 585 L155 575 L153 585 L156 600 L156 650"/>
+        {/* Runway edge lights */}
+        <g opacity="0.6">
+          <circle cx="420" cy="750" r="3" fill="#e8c840"/>
+          <circle cx="435" cy="700" r="2.5" fill="#e8c840"/>
+          <circle cx="450" cy="650" r="2.5" fill="#e8c840"/>
+          <circle cx="465" cy="600" r="2" fill="#e8c840"/>
+          <circle cx="480" cy="550" r="2" fill="#e8c840"/>
+          <circle cx="495" cy="500" r="1.5" fill="#e8c840"/>
+          <circle cx="780" cy="750" r="3" fill="#e8c840"/>
+          <circle cx="765" cy="700" r="2.5" fill="#e8c840"/>
+          <circle cx="750" cy="650" r="2.5" fill="#e8c840"/>
+          <circle cx="735" cy="600" r="2" fill="#e8c840"/>
+          <circle cx="720" cy="550" r="2" fill="#e8c840"/>
+          <circle cx="705" cy="500" r="1.5" fill="#e8c840"/>
         </g>
 
-        {/* Tuk-tuk outline */}
-        <g opacity="0.06" stroke="currentColor" strokeWidth="0.6" fill="none" transform="translate(900, 620)">
-          <path d="M0 30 L5 10 L25 5 L40 5 L45 10 L50 10 L55 15 L55 25 L50 30"/>
-          <circle cx="12" cy="30" r="5"/>
-          <circle cx="45" cy="30" r="5"/>
-          <path d="M25 5 L25 15 L40 15 L40 5"/>
+        {/* Control tower */}
+        <g opacity="0.18" fill="rgba(90,154,207,0.3)" stroke="#5a9acf" strokeWidth="1.2">
+          <rect x="100" y="380" width="35" height="130" rx="2"/>
+          <rect x="88" y="355" width="60" height="30" rx="4"/>
+          {/* Tower windows */}
+          <rect x="95" y="362" width="10" height="14" rx="1" fill="rgba(232,200,64,0.3)"/>
+          <rect x="110" y="362" width="10" height="14" rx="1" fill="rgba(232,200,64,0.3)"/>
+          <rect x="125" y="362" width="10" height="14" rx="1" fill="rgba(232,200,64,0.3)"/>
+          {/* Antenna */}
+          <line x1="118" y1="355" x2="118" y2="330" strokeWidth="1.5"/>
+          <circle cx="118" cy="328" r="3" fill="rgba(232,50,50,0.5)"/>
         </g>
 
-        {/* Floating paper planes */}
-        <g opacity="0.06" stroke="currentColor" strokeWidth="0.5" fill="none">
-          <path d="M100 200 L130 190 L120 210 L112 202 L100 200Z" />
-          <path d="M500 150 L530 140 L520 160 L512 152 L500 150Z" />
-          <path d="M900 250 L930 240 L920 260 L912 252 L900 250Z" />
-          <path d="M700 100 L720 95 L715 108 L710 103 L700 100Z" />
-          <path d="M200 350 L220 345 L215 358 L210 353 L200 350Z" />
-          <path d="M1050 180 L1070 175 L1065 188 L1060 183 L1050 180Z" />
+        {/* Parked aircraft — filled shapes */}
+        <g opacity="0.15">
+          {/* Aircraft 1 */}
+          <g transform="translate(200, 550) rotate(-8)">
+            <path d="M0 0 L60 -3 L70 0 L60 3 L0 0Z" fill="rgba(90,154,207,0.4)" stroke="#5a9acf" strokeWidth="0.8"/>
+            <path d="M20 -3 L15 -15 L40 -15 L35 -3" fill="rgba(90,154,207,0.3)" stroke="#5a9acf" strokeWidth="0.6"/>
+            <path d="M20 3 L15 15 L40 15 L35 3" fill="rgba(90,154,207,0.3)" stroke="#5a9acf" strokeWidth="0.6"/>
+          </g>
+          {/* Aircraft 2 */}
+          <g transform="translate(900, 520) rotate(5)">
+            <path d="M0 0 L50 -2 L58 0 L50 2 L0 0Z" fill="rgba(90,154,207,0.4)" stroke="#5a9acf" strokeWidth="0.8"/>
+            <path d="M15 -2 L12 -12 L32 -12 L29 -2" fill="rgba(90,154,207,0.3)" stroke="#5a9acf" strokeWidth="0.6"/>
+            <path d="M15 2 L12 12 L32 12 L29 2" fill="rgba(90,154,207,0.3)" stroke="#5a9acf" strokeWidth="0.6"/>
+          </g>
+          {/* Aircraft 3 on taxiway */}
+          <g transform="translate(850, 680) rotate(-3)">
+            <path d="M0 0 L40 -2 L46 0 L40 2 L0 0Z" fill="rgba(90,154,207,0.35)" stroke="#5a9acf" strokeWidth="0.6"/>
+            <path d="M12 -2 L10 -9 L25 -9 L23 -2" fill="rgba(90,154,207,0.25)" stroke="#5a9acf" strokeWidth="0.5"/>
+            <path d="M12 2 L10 9 L25 9 L23 2" fill="rgba(90,154,207,0.25)" stroke="#5a9acf" strokeWidth="0.5"/>
+          </g>
         </g>
 
-        {/* Modern buildings (Bangkok skyline) */}
-        <g opacity="0.05" stroke="currentColor" strokeWidth="0.5" fill="none">
-          <rect x="450" y="550" width="20" height="100" rx="1"/>
-          <rect x="480" y="520" width="15" height="130" rx="1"/>
-          <rect x="510" y="540" width="25" height="110" rx="1"/>
-          <rect x="680" y="560" width="18" height="90" rx="1"/>
-          <rect x="710" y="530" width="22" height="120" rx="1"/>
-          <rect x="1000" y="550" width="20" height="100" rx="1"/>
-          <rect x="1030" y="570" width="15" height="80" rx="1"/>
+        {/* Terminal building */}
+        <g opacity="0.12" fill="rgba(90,154,207,0.2)" stroke="#5a9acf" strokeWidth="0.8">
+          <rect x="250" y="430" width="400" height="35" rx="3"/>
+          {/* Gates/windows */}
+          <rect x="270" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="300" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="330" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="360" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="450" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="480" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="510" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          <rect x="540" y="436" width="18" height="22" rx="2" fill="rgba(232,200,64,0.15)"/>
+          {/* Jetbridges */}
+          <path d="M290 465 L290 490 L305 490" strokeWidth="2" fill="none"/>
+          <path d="M370 465 L370 495 L385 495" strokeWidth="2" fill="none"/>
+          <path d="M490 465 L490 485 L505 485" strokeWidth="2" fill="none"/>
         </g>
+
+        {/* Approach lights */}
+        <g opacity="0.5">
+          <circle cx="600" cy="440" r="3" fill="#e8c840"/>
+          <circle cx="600" cy="420" r="2.5" fill="#e8c840"/>
+          <circle cx="600" cy="400" r="2" fill="#d4883a"/>
+          <circle cx="600" cy="380" r="2" fill="#d4883a"/>
+          <circle cx="600" cy="360" r="1.5" fill="#d4883a"/>
+        </g>
+
+        {/* Horizon */}
+        <line x1="0" y1="440" x2="1200" y2="440" stroke="#5a9acf" strokeWidth="0.8" opacity="0.15"/>
       </svg>
     </div>
   );
@@ -92,28 +132,27 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-6 relative overflow-hidden">
-      <BangkokSkylineBg />
+      <AirportBg />
       <ThemeToggle />
 
-      {/* Ambient glow */}
+      {/* Ambient glows */}
       <div className="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--amber-glow) 0%, transparent 70%)' }} />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--teal-glow) 0%, transparent 70%)' }} />
+      <div className="absolute bottom-[10%] left-[-5%] w-[40%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--teal-glow) 0%, transparent 70%)' }} />
 
-      {/* Floating planes */}
+      {/* Floating aircraft in sky */}
       {[
-        { x: '8%', y: '18%', size: 32, delay: 0 },
-        { x: '82%', y: '12%', size: 24, delay: 2 },
-        { x: '72%', y: '68%', size: 28, delay: 4 },
-        { x: '12%', y: '72%', size: 20, delay: 1 },
+        { x: '6%', y: '12%', size: 48, delay: 0, rotate: -5 },
+        { x: '80%', y: '8%', size: 36, delay: 2, rotate: 12 },
+        { x: '88%', y: '60%', size: 28, delay: 4, rotate: -10 },
       ].map((p, i) => (
         <motion.div
           key={i}
           className="absolute pointer-events-none z-0"
-          style={{ left: p.x, top: p.y, color: 'var(--amber)', opacity: 0.12 }}
-          animate={{ y: [0, -15, 0], x: [0, 10, 0], rotate: [0, 5, -3, 0] }}
-          transition={{ duration: 8 + i * 2, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
+          style={{ left: p.x, top: p.y, color: 'var(--ink)', opacity: 0.12, transform: `rotate(${p.rotate}deg)` }}
+          animate={{ y: [0, -10, 0], x: [0, 6, 0] }}
+          transition={{ duration: 10 + i * 3, repeat: Infinity, delay: p.delay, ease: 'easeInOut' }}
         >
-          <PlaneIcon size={p.size} />
+          <AirplaneIcon size={p.size} />
         </motion.div>
       ))}
 
@@ -124,43 +163,49 @@ export default function LandingPage() {
         transition={{ duration: 0.7 }}
         className="relative z-10 w-full max-w-sm text-center"
       >
-        {/* Hero plane */}
+        {/* Hero airplane */}
         <motion.div
           className="mb-8 inline-block"
-          style={{ color: 'var(--amber)' }}
-          animate={{ y: [0, -8, 0], rotate: [0, 2, -1, 0] }}
-          transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
+          style={{ color: 'var(--ink)' }}
+          animate={{ y: [0, -6, 0], rotate: [0, 1, -1, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <PlaneIcon size={88} />
+          <AirplaneIcon size={120} />
         </motion.div>
 
         <h1 className="heading text-3xl font-bold mb-2">
           Paper Plane
         </h1>
         <p className="text-sm mb-10" style={{ color: 'var(--ink-muted)' }}>
-          Send your thoughts, carried by the wind
+          Your thoughts take flight
         </p>
 
-        {/* Card */}
-        <div className="card">
-          <label className="block text-left text-xs font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>
-            Room Code
+        {/* Card — Flight Board style */}
+        <div className="card relative overflow-hidden">
+          {/* Airline gradient stripe */}
+          <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#4b2d8e] via-[#e41e2b] to-[#005baa]" />
+
+          <label className="block text-left text-[10px] uppercase tracking-widest font-medium mb-2 mt-2 fids-font" style={{ color: 'var(--ink-muted)' }}>
+            Flight Code
           </label>
           <input
             type="text"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6))}
-            placeholder="Enter 6-digit code"
+            placeholder="_ _ _ _ _ _"
             maxLength={6}
-            className="input-zen text-center text-xl font-bold tracking-[0.3em]"
+            className="input-flight"
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
           />
           <button
             onClick={handleJoin}
             disabled={code.length !== 6}
-            className="btn-primary w-full mt-4"
+            className="btn-takeoff w-full mt-5"
           >
-            Join Room
+            <span>Board Flight</span>
+            <svg width="20" height="20" viewBox="0 0 64 64" fill="currentColor" className="takeoff-icon transition-transform duration-200">
+              <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+            </svg>
           </button>
         </div>
 
@@ -168,7 +213,7 @@ export default function LandingPage() {
         <p className="mt-8 text-xs" style={{ color: 'var(--ink-muted)' }}>
           Organizer?{' '}
           <button onClick={() => router.push(userId ? '/dashboard' : '/login')} className="font-semibold underline underline-offset-2" style={{ color: 'var(--amber)' }}>
-            {userId ? 'Dashboard' : 'Sign in'}
+            {userId ? 'Control Tower' : 'Crew Login'}
           </button>
         </p>
       </motion.div>

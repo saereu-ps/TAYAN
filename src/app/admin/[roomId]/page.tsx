@@ -7,12 +7,32 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from '../../theme-provider';
 
-function PlaneIcon({ size = 64 }: { size?: number }) {
+const AIRLINES = [
+  { name: 'Thai Airways', className: 'airline-thai', label: 'TG' },
+  { name: 'AirAsia', className: 'airline-airasia', label: 'FD' },
+  { name: 'Bangkok Airways', className: 'airline-bangkok', label: 'PG' },
+  { name: 'Nok Air', className: 'airline-nok', label: 'DD' },
+  { name: 'Thai Smile', className: 'airline-smile', label: 'WE' },
+];
+
+function getAirlineForId(id: string) {
+  let hash = 0;
+  for (let i = 0; i < id.length; i++) {
+    hash = ((hash << 5) - hash) + id.charCodeAt(i);
+    hash |= 0;
+  }
+  return AIRLINES[Math.abs(hash) % AIRLINES.length];
+}
+
+function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 32L56 8L40 56L30 36L4 32Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 36L56 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-      <path d="M30 36V50L38 42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
     </svg>
   );
 }
@@ -27,12 +47,8 @@ function BackIcon() {
 
 function BroadcastIcon() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9" />
-      <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.4" />
-      <circle cx="12" cy="12" r="2" />
-      <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.4" />
-      <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1" />
+    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
     </svg>
   );
 }
@@ -75,30 +91,50 @@ function UsersIcon() {
   );
 }
 
-function AdminBg() {
+function RadarBg() {
   return (
-    <div className="svg-bg opacity-[0.03]">
+    <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Paper planes scattered */}
-        <g stroke="currentColor" strokeWidth="0.5" fill="none">
-          <path d="M100 100 L130 90 L120 115 L112 105 L100 100Z"/>
-          <path d="M300 200 L320 195 L315 210 L310 205 L300 200Z"/>
-          <path d="M900 150 L930 140 L920 165 L912 155 L900 150Z"/>
-          <path d="M700 300 L720 295 L715 310 L710 305 L700 300Z"/>
-          <path d="M1050 250 L1070 245 L1065 260 L1060 255 L1050 250Z"/>
-          <path d="M200 500 L220 495 L215 510 L210 505 L200 500Z"/>
-          <path d="M800 450 L820 445 L815 460 L810 455 L800 450Z"/>
-          <path d="M500 100 L520 95 L515 110 L510 105 L500 100Z"/>
-          <path d="M1100 400 L1120 395 L1115 410 L1110 405 L1100 400Z"/>
+        {/* Concentric radar circles */}
+        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8">
+          <circle cx="600" cy="400" r="100"/>
+          <circle cx="600" cy="400" r="200"/>
+          <circle cx="600" cy="400" r="300"/>
+          <circle cx="600" cy="400" r="400"/>
+          <circle cx="600" cy="400" r="500"/>
         </g>
-        {/* Clouds */}
-        <g stroke="currentColor" strokeWidth="0.3" fill="none">
-          <path d="M50 150 Q80 130 110 140 Q130 125 160 135 Q180 130 190 150"/>
-          <path d="M400 80 Q420 65 440 75 Q460 60 480 70 Q500 65 510 80"/>
-          <path d="M750 200 Q780 185 800 195 Q820 180 840 190"/>
-          <path d="M1000 100 Q1020 85 1040 95 Q1060 80 1080 90 Q1100 85 1110 100"/>
-          <path d="M200 350 Q220 335 240 345 Q260 330 280 340"/>
-          <path d="M600 450 Q620 435 640 445 Q660 430 680 440"/>
+
+        {/* Crosshair lines */}
+        <g opacity="0.06" stroke="currentColor" strokeWidth="0.5">
+          <line x1="600" y1="0" x2="600" y2="800"/>
+          <line x1="0" y1="400" x2="1200" y2="400"/>
+          <line x1="175" y1="0" x2="1025" y2="800"/>
+          <line x1="1025" y1="0" x2="175" y2="800"/>
+        </g>
+
+        {/* Blips — aircraft on radar */}
+        <g opacity="0.2" fill="currentColor">
+          <circle cx="450" cy="250" r="4"/>
+          <circle cx="750" cy="320" r="3"/>
+          <circle cx="380" cy="500" r="3"/>
+          <circle cx="820" cy="480" r="4"/>
+          <circle cx="550" cy="180" r="2.5"/>
+          <circle cx="700" cy="600" r="3"/>
+        </g>
+
+        {/* Blip trails */}
+        <g opacity="0.08" stroke="currentColor" strokeWidth="1" strokeDasharray="3 4">
+          <line x1="450" y1="250" x2="420" y2="270"/>
+          <line x1="750" y1="320" x2="770" y2="340"/>
+          <line x1="820" y1="480" x2="840" y2="460"/>
+        </g>
+
+        {/* Grid labels feel */}
+        <g opacity="0.05" fill="currentColor" fontSize="8" fontFamily="monospace">
+          <text x="610" y="108">100</text>
+          <text x="610" y="208">200</text>
+          <text x="610" y="308">300</text>
+          <text x="610" y="508">500</text>
         </g>
       </svg>
     </div>
@@ -138,7 +174,7 @@ export default function AdminRoomPage() {
     onSuccess: () => planesQuery.refetch(),
   });
 
-  // Track new planes for animation
+  // Track new planes for fly-in animation
   useEffect(() => {
     if (!planesQuery.data) return;
     if (initialLoadRef.current) {
@@ -182,11 +218,11 @@ export default function AdminRoomPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <AdminBg />
+      <RadarBg />
       <ThemeToggle />
 
       <div className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
-        {/* Header */}
+        {/* Header — Control Tower */}
         <div className="flex items-start gap-4 mb-8">
           <button
             onClick={() => router.push('/dashboard')}
@@ -196,7 +232,11 @@ export default function AdminRoomPage() {
             <BackIcon />
           </button>
           <div className="flex-1 min-w-0">
-            <h1 className="heading text-xl font-semibold truncate">{room?.name ?? 'Loading...'}</h1>
+            <div className="flex items-center gap-2">
+              <h1 className="heading text-xl font-semibold truncate">Control Tower</h1>
+              <span className="text-lg">🗼</span>
+            </div>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--ink-muted)' }}>{room?.name ?? 'Loading...'}</p>
             {room && (
               <div className="flex flex-wrap items-center gap-3 mt-2">
                 <button
@@ -204,15 +244,15 @@ export default function AdminRoomPage() {
                   className="flex items-center gap-1.5 text-xs transition-all hover:opacity-80"
                   style={{ color: 'var(--ink-muted)' }}
                 >
-                  <span className="font-mono tracking-wider">{room.code}</span>
+                  <span className="fids-font font-mono tracking-wider">{room.code}</span>
                   <CopyIcon />
-                  {copied && <span className="text-[10px]" style={{ color: 'var(--teal)' }}>Copied</span>}
+                  {copied && <span className="text-[10px]" style={{ color: 'var(--success)' }}>Copied</span>}
                 </button>
                 <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
                   {room.status}
                 </span>
                 <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--ink-muted)' }}>
-                  <UsersIcon /> {room.participantCount}
+                  <UsersIcon /> {room.participantCount} passengers
                 </span>
               </div>
             )}
@@ -221,24 +261,24 @@ export default function AdminRoomPage() {
 
         {/* Feed header */}
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
-            Incoming Planes ({planes.length})
+          <h2 className="fids-font text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
+            Incoming Flights ({planes.length})
           </h2>
           <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--teal)' }} />
-            <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>Live</span>
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />
+            <span className="fids-font text-[10px]" style={{ color: 'var(--ink-muted)' }}>Radar Active</span>
           </div>
         </div>
 
-        {/* Planes Feed */}
+        {/* Planes Feed — Boarding pass style */}
         {planes.length === 0 ? (
           <div className="card text-center py-16">
             <div className="opacity-20 mb-4 flex justify-center" style={{ color: 'var(--ink)' }}>
-              <PlaneIcon size={48} />
+              <AirplaneIcon size={48} />
             </div>
-            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Waiting for paper planes...</p>
+            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Airspace clear — no incoming flights</p>
             <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>
-              Share code <span className="font-mono tracking-wider">{room?.code}</span> with participants
+              Share code <span className="fids-font font-mono tracking-wider">{room?.code}</span> with passengers
             </p>
           </div>
         ) : (
@@ -246,74 +286,86 @@ export default function AdminRoomPage() {
             <AnimatePresence>
               {planes.map((plane) => {
                 const isNew = newPlaneIds.has(plane.id);
+                const airline = getAirlineForId(plane.id);
                 return (
                   <motion.div
                     key={plane.id}
-                    initial={isNew ? { x: 200, y: -60, opacity: 0, rotate: -15, scale: 0.6 } : { opacity: 1 }}
-                    animate={{ x: 0, y: 0, opacity: 1, rotate: 0, scale: 1 }}
+                    initial={isNew ? { x: 300, opacity: 0, scale: 0.7 } : { opacity: 1 }}
+                    animate={{ x: 0, opacity: 1, scale: 1 }}
                     exit={{ x: -100, opacity: 0 }}
                     transition={
                       isNew
                         ? { type: 'spring', stiffness: 60, damping: 12, duration: 0.8 }
                         : { duration: 0.2 }
                     }
-                    className="card relative"
-                    style={{
-                      borderLeft: plane.isPinned ? '3px solid var(--amber)' : undefined,
-                    }}
+                    className="card-boarding-pass relative"
                   >
-                    {/* Landing plane icon for new messages */}
+                    {/* Airline color strip */}
+                    <div className={`h-1.5 ${airline.className}`} />
+
+                    {/* Flying plane icon for new messages */}
                     {isNew && (
                       <motion.div
-                        className="absolute -top-3 -right-3"
-                        initial={{ scale: 1.5, opacity: 1, rotate: -20 }}
-                        animate={{ scale: 0, opacity: 0, rotate: 0 }}
+                        className="absolute -top-2 -right-2"
+                        initial={{ scale: 1.5, opacity: 1, x: 20 }}
+                        animate={{ scale: 0, opacity: 0, x: 0 }}
                         transition={{ duration: 1, delay: 0.3 }}
-                        style={{ color: 'var(--amber)' }}
+                        style={{ color: 'var(--blue)' }}
                       >
-                        <PlaneIcon size={24} />
+                        <AirplaneIcon size={20} />
                       </motion.div>
                     )}
 
-                    <p className="text-sm mb-3 leading-relaxed">{plane.content}</p>
-
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>
-                          {plane.senderName || 'Anonymous'}
-                        </span>
-                        <span className="text-[10px]" style={{ color: 'var(--ink-muted)', opacity: 0.5 }}>
+                    <div className="px-5 py-4">
+                      {/* Flight info header */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <span className="fids-font text-[10px] font-bold tracking-wider">{airline.label}-{plane.id.slice(-4).toUpperCase()}</span>
+                          <span className="text-[9px]" style={{ color: 'var(--ink-muted)' }}>{airline.name}</span>
+                        </div>
+                        <span className="fids-font text-[10px]" style={{ color: 'var(--ink-muted)' }}>
                           {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={() =>
-                            plane.isBroadcasted
-                              ? unbroadcastMutation.mutate({ planeId: plane.id })
-                              : broadcastMutation.mutate({ planeId: plane.id })
-                          }
-                          className={`btn-pill ${plane.isBroadcasted ? 'active' : ''}`}
-                          title={plane.isBroadcasted ? 'Unbroadcast' : 'Broadcast'}
-                        >
-                          <BroadcastIcon />
-                          <span>{plane.isBroadcasted ? 'On Air' : 'Broadcast'}</span>
-                        </button>
-                        <button
-                          onClick={() => pinMutation.mutate({ planeId: plane.id })}
-                          className={`btn-pill ${plane.isPinned ? 'active' : ''}`}
-                          title={plane.isPinned ? 'Unpin' : 'Pin'}
-                        >
-                          <PinIcon />
-                        </button>
-                        <button
-                          onClick={() => removeMutation.mutate({ planeId: plane.id })}
-                          className="btn-pill hover:!border-red-400 hover:!text-red-400"
-                          title="Remove"
-                        >
-                          <TrashIcon />
-                        </button>
+                      <p className="text-sm mb-3 leading-relaxed">{plane.content}</p>
+
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>
+                          {plane.senderName || 'Anonymous Passenger'}
+                        </span>
+
+                        <div className="flex items-center gap-1.5">
+                          {/* Clear for broadcast (green) */}
+                          <button
+                            onClick={() =>
+                              plane.isBroadcasted
+                                ? unbroadcastMutation.mutate({ planeId: plane.id })
+                                : broadcastMutation.mutate({ planeId: plane.id })
+                            }
+                            className={`btn-atc-broadcast ${plane.isBroadcasted ? 'active' : ''}`}
+                            title={plane.isBroadcasted ? 'Revoke clearance' : 'Clear for broadcast'}
+                          >
+                            <BroadcastIcon />
+                            <span>{plane.isBroadcasted ? 'On Air' : 'Clear'}</span>
+                          </button>
+                          {/* Hold (amber/pin) */}
+                          <button
+                            onClick={() => pinMutation.mutate({ planeId: plane.id })}
+                            className={`btn-atc-hold ${plane.isPinned ? 'active' : ''}`}
+                            title={plane.isPinned ? 'Release hold' : 'Hold'}
+                          >
+                            <PinIcon />
+                          </button>
+                          {/* Reject (red/remove) */}
+                          <button
+                            onClick={() => removeMutation.mutate({ planeId: plane.id })}
+                            className="btn-atc-reject"
+                            title="Reject"
+                          >
+                            <TrashIcon />
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </motion.div>

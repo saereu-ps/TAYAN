@@ -3,352 +3,284 @@
 @tailwind utilities;
 
 :root {
-  /* Day Mode — Warm Cream + Ink */
-  --bg: #f8f4ee;
+  --bg: #f0f4f8;
   --bg-card: #ffffff;
   --ink: #1a1d24;
-  --ink-muted: #6b6860;
-  --amber: #d4883a;
-  --amber-hover: #c07a2a;
-  --amber-glow: rgba(212, 136, 58, 0.15);
-  --teal: #2a6b5a;
-  --teal-glow: rgba(42, 107, 90, 0.1);
-  --border: #eae5dc;
-  --shadow: rgba(26, 29, 36, 0.06);
-  --shadow-lg: rgba(26, 29, 36, 0.1);
-  --paper: #fdfbf7;
-  --paper-line: rgba(212, 136, 58, 0.06);
-  --error: #c05a3a;
-  --success: #2a6b5a;
+  --ink-muted: #5a6070;
+  --blue: #1a56db;
+  --blue-light: #dbeafe;
+  --orange: #ea580c;
+  --amber: #d97706;
+  --teal: #0d9488;
+  --border: #e2e8f0;
+  --shadow: rgba(15, 23, 42, 0.06);
+  --shadow-lg: rgba(15, 23, 42, 0.12);
+  --error: #dc2626;
+  --success: #16a34a;
+  --runway: #334155;
+  --amber-glow: rgba(217, 119, 6, 0.06);
+  --teal-glow: rgba(13, 148, 136, 0.04);
+
+  /* Airline brand colors */
+  --airline-thai: #4b2d8e;
+  --airline-thai-gold: #c4a44e;
+  --airline-airasia: #e41e2b;
+  --airline-bangkok-blue: #005baa;
+  --airline-bangkok-teal: #00a3a1;
+  --airline-nok-green: #76b82a;
+  --airline-nok-yellow: #ffd100;
+  --airline-smile: #f58220;
 }
 
 .dark {
-  /* Night Mode — Deep + Warm Cream text */
-  --bg: #12151c;
-  --bg-card: #1a1e27;
-  --ink: #f0ebe0;
-  --ink-muted: #8a8580;
-  --amber: #e8a050;
-  --amber-hover: #d4903a;
-  --amber-glow: rgba(232, 160, 80, 0.12);
-  --teal: #4aaa90;
-  --teal-glow: rgba(26, 74, 58, 0.2);
-  --border: #2a2e38;
-  --shadow: rgba(0, 0, 0, 0.3);
-  --shadow-lg: rgba(0, 0, 0, 0.4);
-  --paper: #1e2229;
-  --paper-line: rgba(232, 160, 80, 0.04);
-  --error: #e07050;
-  --success: #4aaa90;
+  --bg: #0f1219;
+  --bg-card: #1a1f2a;
+  --ink: #e8edf5;
+  --ink-muted: #8a92a0;
+  --blue: #60a5fa;
+  --blue-light: rgba(96,165,250,0.1);
+  --orange: #fb923c;
+  --amber: #fbbf24;
+  --teal: #2dd4bf;
+  --border: #2a3040;
+  --shadow: rgba(0,0,0,0.3);
+  --shadow-lg: rgba(0,0,0,0.5);
+  --error: #f87171;
+  --success: #4ade80;
+  --runway: #64748b;
+  --amber-glow: rgba(251, 191, 36, 0.06);
+  --teal-glow: rgba(45, 212, 191, 0.04);
+
+  --airline-thai: #7c5bb5;
+  --airline-thai-gold: #d4b85e;
+  --airline-airasia: #ff4d54;
+  --airline-bangkok-blue: #3d8fd4;
+  --airline-bangkok-teal: #2dc4c1;
+  --airline-nok-green: #96d84a;
+  --airline-nok-yellow: #ffe040;
+  --airline-smile: #ffa050;
 }
 
 @layer base {
   body {
-    font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
-    background-color: var(--bg);
+    font-family: var(--font-sans), system-ui, sans-serif;
+    background: var(--bg);
     color: var(--ink);
     -webkit-font-smoothing: antialiased;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    transition: background 0.3s, color 0.3s;
   }
 }
 
 @layer components {
-  /* Typography */
-  .heading {
-    font-family: var(--font-serif), 'Noto Serif', serif;
-    letter-spacing: 0.02em;
-  }
+  .heading { font-family: var(--font-serif), serif; letter-spacing: -0.01em; }
 
-  /* Theme Toggle */
   .theme-toggle {
-    @apply fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center transition-all duration-200;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    color: var(--ink);
-    box-shadow: 0 2px 8px var(--shadow);
+    @apply fixed top-5 right-5 z-50 w-10 h-10 rounded-full flex items-center justify-center;
+    background: var(--bg-card); border: 1px solid var(--border); color: var(--ink);
+    box-shadow: 0 2px 8px var(--shadow); transition: all 0.2s;
   }
-  .theme-toggle:hover {
-    border-color: var(--amber);
-    color: var(--amber);
-    transform: scale(1.05);
-  }
+  .theme-toggle:hover { border-color: var(--blue); color: var(--blue); transform: scale(1.05); }
 
-  /* Cards */
   .card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 2px 8px var(--shadow), 0 8px 24px var(--shadow);
-    transition: background-color 0.3s ease, border-color 0.3s ease;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px;
+    box-shadow: 0 1px 4px var(--shadow), 0 4px 16px var(--shadow);
   }
 
-  .card-paper {
-    background: var(--paper);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 20px 24px;
-    background-image: repeating-linear-gradient(
-      0deg, transparent, transparent 28px,
-      var(--paper-line) 28px, var(--paper-line) 29px
-    );
-    box-shadow: 0 2px 8px var(--shadow);
-  }
-
-  /* Boarding Pass Card */
-  .card-boarding-pass {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    overflow: hidden;
-    position: relative;
+  .boarding-pass {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; position: relative;
     box-shadow: 0 2px 12px var(--shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
   }
-  .card-boarding-pass:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px var(--shadow-lg);
+  .boarding-pass::before, .boarding-pass::after {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    width: 14px; height: 28px; background: var(--bg); z-index: 1;
   }
-  .card-boarding-pass::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 24px;
-    background: var(--bg);
-    border-radius: 0 12px 12px 0;
-  }
-  .card-boarding-pass::after {
-    content: '';
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 12px;
-    height: 24px;
-    background: var(--bg);
-    border-radius: 12px 0 0 12px;
-  }
+  .boarding-pass::before { left: -7px; border-radius: 0 14px 14px 0; }
+  .boarding-pass::after { right: -7px; border-radius: 14px 0 0 14px; }
+  .boarding-pass .divider { border-top: 2px dashed var(--border); margin: 0 20px; }
 
-  .boarding-pass-divider {
-    border-top: 2px dashed var(--border);
-    margin: 12px 16px;
-  }
-
-  /* Buttons */
   .btn-primary {
-    @apply px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200;
-    background: linear-gradient(135deg, var(--amber) 0%, var(--amber-hover) 100%);
-    color: #fff;
-    box-shadow: 0 4px 12px rgba(212, 136, 58, 0.25);
+    @apply px-6 py-3 rounded-xl text-sm font-semibold transition-all;
+    background: var(--blue); color: #fff;
+    box-shadow: 0 4px 12px rgba(26,86,219,0.2);
   }
-  .btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(212, 136, 58, 0.35);
-  }
-  .btn-primary:active {
-    transform: translateY(0);
-  }
-  .btn-primary:disabled {
-    opacity: 0.3;
-    transform: none;
-    box-shadow: none;
-    cursor: not-allowed;
-  }
-
-  .btn-dark {
-    @apply px-6 py-3 rounded-xl text-sm font-semibold transition-all duration-200;
-    background: var(--ink);
-    color: var(--bg);
-  }
-  .btn-dark:hover {
-    transform: translateY(-1px);
-    opacity: 0.9;
-  }
-
-  .btn-ghost {
-    @apply px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200;
-    color: var(--ink-muted);
-    border: 1px solid var(--border);
-  }
-  .btn-ghost:hover {
-    border-color: var(--amber);
-    color: var(--amber);
-    background: var(--amber-glow);
-  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(26,86,219,0.3); }
+  .btn-primary:disabled { opacity: 0.3; transform: none; box-shadow: none; cursor: not-allowed; }
 
   .btn-pill {
-    @apply px-4 py-1.5 rounded-full text-xs font-medium transition-all duration-200 flex items-center gap-1.5;
-    border: 1px solid var(--border);
-    color: var(--ink-muted);
+    @apply px-3 py-1.5 rounded-full text-[11px] font-medium flex items-center gap-1 transition-all;
+    border: 1px solid var(--border); color: var(--ink-muted);
   }
-  .btn-pill:hover {
-    border-color: var(--amber);
-    color: var(--amber);
-    background: var(--amber-glow);
-  }
-  .btn-pill.active {
-    background: var(--amber);
-    color: #fff;
-    border-color: var(--amber);
-  }
+  .btn-pill:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-light); }
+  .btn-pill.active { background: var(--blue); color: #fff; border-color: var(--blue); }
 
-  /* Input */
   .input-zen {
-    @apply w-full px-4 py-3.5 rounded-xl text-sm transition-all duration-200;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    color: var(--ink);
+    @apply w-full px-4 py-3.5 rounded-xl text-sm;
+    background: var(--bg); border: 1.5px solid var(--border); color: var(--ink); transition: all 0.2s;
   }
-  .input-zen:focus {
-    outline: none;
-    border-color: var(--amber);
-    box-shadow: 0 0 0 3px var(--amber-glow);
-  }
-  .input-zen::placeholder {
-    color: var(--ink-muted);
-    opacity: 0.5;
-  }
+  .input-zen:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,86,219,0.08); }
+  .input-zen::placeholder { color: var(--ink-muted); opacity: 0.5; }
 
-  /* Send button — large circular */
+  /* Flight number input — LED/digital feel */
+  .input-flight {
+    @apply w-full px-5 py-4 rounded-xl text-center text-2xl tracking-[0.4em] font-mono;
+    background: var(--bg); border: 1.5px solid var(--border); color: var(--ink);
+    transition: all 0.2s; letter-spacing: 0.4em;
+  }
+  .input-flight:focus { outline: none; border-color: var(--amber); box-shadow: 0 0 0 3px rgba(217,119,6,0.1); }
+  .input-flight::placeholder { color: var(--ink-muted); opacity: 0.3; letter-spacing: 0.5em; }
+
+  /* Takeoff button */
+  .btn-takeoff {
+    @apply flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl text-sm font-semibold transition-all;
+    background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
+    color: #fff; box-shadow: 0 4px 16px rgba(26,86,219,0.25);
+  }
+  .btn-takeoff:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(26,86,219,0.35); }
+  .btn-takeoff:hover .takeoff-icon { transform: translateX(3px) rotate(-15deg); }
+  .btn-takeoff:disabled { opacity: 0.3; transform: none; box-shadow: none; cursor: not-allowed; }
+
   .btn-send {
-    @apply flex items-center justify-center rounded-full transition-all duration-300;
-    width: 64px;
-    height: 64px;
-    background: linear-gradient(135deg, var(--amber) 0%, var(--amber-hover) 100%);
-    color: #fff;
-    box-shadow: 0 4px 16px rgba(212, 136, 58, 0.3);
+    @apply flex items-center justify-center rounded-full;
+    width: 64px; height: 64px;
+    background: linear-gradient(135deg, var(--blue) 0%, #3b82f6 100%);
+    color: #fff; box-shadow: 0 4px 20px rgba(26,86,219,0.3); transition: all 0.3s;
   }
-  .btn-send:hover {
-    transform: scale(1.08);
-    box-shadow: 0 6px 24px rgba(212, 136, 58, 0.4);
+  .btn-send:hover { transform: scale(1.08); box-shadow: 0 6px 28px rgba(26,86,219,0.4); }
+  .btn-send:disabled { opacity: 0.2; transform: none; box-shadow: none; }
+
+  .badge-active { @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium; background: rgba(22,163,74,0.1); color: var(--success); }
+  .badge-paused { @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium; background: rgba(217,119,6,0.1); color: var(--amber); }
+  .badge-closed { @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium; background: rgba(100,116,139,0.1); color: var(--ink-muted); }
+
+  .svg-bg { position: absolute; inset: 0; overflow: hidden; pointer-events: none; z-index: 0; }
+  .svg-bg svg { width: 100%; height: 100%; }
+
+  /* Airline brand accent strips */
+  .airline-thai {
+    background: linear-gradient(135deg, var(--airline-thai) 0%, var(--airline-thai-gold) 100%);
   }
-  .btn-send:active {
-    transform: scale(0.95);
+  .airline-airasia {
+    background: var(--airline-airasia);
   }
-  .btn-send:disabled {
-    opacity: 0.25;
-    transform: none;
-    box-shadow: none;
+  .airline-bangkok {
+    background: linear-gradient(135deg, var(--airline-bangkok-blue) 0%, var(--airline-bangkok-teal) 100%);
+  }
+  .airline-nok {
+    background: linear-gradient(135deg, var(--airline-nok-green) 0%, var(--airline-nok-yellow) 100%);
+  }
+  .airline-smile {
+    background: var(--airline-smile);
   }
 
-  /* Status badges */
-  .badge-active {
-    @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium;
-    background: rgba(42, 107, 90, 0.1);
-    color: var(--teal);
+  /* Boarding pass card for messages */
+  .card-boarding-pass {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden; position: relative;
+    box-shadow: 0 2px 12px var(--shadow); transition: all 0.2s;
   }
-  .badge-paused {
-    @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium;
-    background: rgba(212, 136, 58, 0.1);
-    color: var(--amber);
+  .card-boarding-pass::before, .card-boarding-pass::after {
+    content: ''; position: absolute; top: 50%; transform: translateY(-50%);
+    width: 12px; height: 24px; background: var(--bg); z-index: 1;
   }
-  .badge-closed {
-    @apply text-[10px] px-2.5 py-0.5 rounded-full font-medium;
-    background: rgba(107, 104, 96, 0.1);
-    color: var(--ink-muted);
+  .card-boarding-pass::before { left: -6px; border-radius: 0 12px 12px 0; }
+  .card-boarding-pass::after { right: -6px; border-radius: 12px 0 0 12px; }
+
+  .boarding-pass-divider {
+    border-top: 2px dashed var(--border); margin: 0 20px;
+  }
+
+  /* Composer card */
+  .card-paper {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 16px; padding: 20px;
+    box-shadow: 0 2px 12px var(--shadow), 0 8px 32px var(--shadow);
+  }
+
+  /* ATC action buttons */
+  .btn-atc-broadcast {
+    @apply px-3 py-1.5 rounded-full text-[11px] font-medium flex items-center gap-1 transition-all;
+    border: 1px solid var(--success); color: var(--success); background: transparent;
+  }
+  .btn-atc-broadcast:hover { background: var(--success); color: #fff; }
+  .btn-atc-broadcast.active { background: var(--success); color: #fff; }
+
+  .btn-atc-hold {
+    @apply px-3 py-1.5 rounded-full text-[11px] font-medium flex items-center gap-1 transition-all;
+    border: 1px solid var(--amber); color: var(--amber); background: transparent;
+  }
+  .btn-atc-hold:hover { background: var(--amber); color: #fff; }
+  .btn-atc-hold.active { background: var(--amber); color: #fff; }
+
+  .btn-atc-reject {
+    @apply px-3 py-1.5 rounded-full text-[11px] font-medium flex items-center gap-1 transition-all;
+    border: 1px solid var(--error); color: var(--error); background: transparent;
+  }
+  .btn-atc-reject:hover { background: var(--error); color: #fff; }
+
+  /* Flight board row style */
+  .flight-row {
+    @apply flex items-center px-5 py-4 transition-all;
+    border-bottom: 1px solid var(--border);
+  }
+  .flight-row:hover { background: var(--blue-light); }
+  .flight-row:last-child { border-bottom: none; }
+
+  /* FIDS font (Flight Information Display System) */
+  .fids-font {
+    font-family: var(--font-sans), 'SF Mono', 'Fira Code', monospace;
+    letter-spacing: 0.05em;
   }
 }
 
-/* Backdrop blur utility */
+/* Backdrop for send animation */
 .backdrop-send {
-  position: fixed;
-  inset: 0;
-  z-index: 40;
-  backdrop-filter: blur(8px);
-  background: rgba(18, 21, 28, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
+  position: fixed; inset: 0; z-index: 40;
+  backdrop-filter: blur(12px);
+  background: rgba(15,18,25,0.6);
+  display: flex; align-items: center; justify-content: center; flex-direction: column;
 }
 
-/* Paper plane fly animation */
-@keyframes flyAway {
-  0% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-  30% {
-    transform: translate(40px, -60px) rotate(-10deg) scale(1.2);
-    opacity: 1;
-  }
-  60% {
-    transform: translate(150px, -180px) rotate(-20deg) scale(1.0);
-    opacity: 0.9;
-  }
-  100% {
-    transform: translate(400px, -350px) rotate(-35deg) scale(0.6);
-    opacity: 0;
-  }
+/* Runway animated line */
+@keyframes runwayScroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.runway-line {
+  background: repeating-linear-gradient(90deg, var(--runway) 0px, var(--runway) 40px, transparent 40px, transparent 60px);
+  height: 3px; width: 200%; animation: runwayScroll 1s linear infinite;
 }
 
-.plane-fly {
-  animation: flyAway 1.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+/* Engine rev shake */
+@keyframes engineRev {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-2px); }
+}
+.engine-rev {
+  animation: engineRev 0.1s ease-in-out 3;
 }
 
-/* Trail dots */
-@keyframes trailFade {
-  0% { opacity: 0.6; transform: scale(1); }
-  100% { opacity: 0; transform: scale(0.3); }
+/* Exhaust puff */
+@keyframes puffFade {
+  0% { opacity: 0.6; transform: scale(1) translateX(0); }
+  100% { opacity: 0; transform: scale(2.5) translateX(-40px); }
 }
-.trail-dot {
+.exhaust-puff {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: rgba(148, 163, 184, 0.4);
   position: absolute;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--amber);
-  animation: trailFade 0.8s ease-out forwards;
+  animation: puffFade 1s ease-out forwards;
 }
 
-/* Receive animation — plane landing */
-@keyframes planeLand {
-  0% {
-    transform: translate(200px, -100px) rotate(-25deg) scale(0.5);
-    opacity: 0;
-  }
-  50% {
-    transform: translate(50px, -20px) rotate(-10deg) scale(0.8);
-    opacity: 1;
-  }
-  80% {
-    transform: translate(0, 5px) rotate(2deg) scale(1.02);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(0, 0) rotate(0deg) scale(1);
-    opacity: 1;
-  }
-}
-
-.plane-land {
-  animation: planeLand 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-}
-
-/* SVG Background styles */
-.svg-bg {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 0;
-}
-.svg-bg svg {
-  width: 100%;
-  height: 100%;
-}
-
-/* Departure board styling */
-.departure-board {
-  font-family: var(--font-sans), monospace;
-  letter-spacing: 0.05em;
+/* Radar concentric circles for ATC */
+@keyframes radarSweep {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
+  *, ::before, ::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
 }

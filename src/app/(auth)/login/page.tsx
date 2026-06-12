@@ -7,86 +7,75 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from '../../theme-provider';
 
-function PlaneIcon({ size = 64 }: { size?: number }) {
+function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 32L56 8L40 56L30 36L4 32Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 36L56 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-      <path d="M30 36V50L38 42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
     </svg>
   );
 }
 
-function ThaiCanalBg() {
+function CheckInBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMax slice">
-        {/* Canal water */}
-        <g opacity="0.06" stroke="currentColor" fill="none">
-          <path d="M0 600 Q200 580 400 610 Q600 640 800 605 Q1000 570 1200 600 L1200 800 L0 800Z" strokeWidth="0.5"/>
-          <path d="M0 620 Q300 600 500 630 Q700 660 900 625 Q1100 590 1200 620" strokeWidth="0.3"/>
-          <path d="M0 640 Q250 625 450 650 Q650 675 850 645 Q1050 615 1200 640" strokeWidth="0.2"/>
+        {/* Check-in counters */}
+        <g opacity="0.12" stroke="currentColor" fill="none" strokeWidth="1">
+          {/* Counter row */}
+          <rect x="100" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+          <rect x="250" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+          <rect x="400" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+          <rect x="680" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+          <rect x="830" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+          <rect x="980" y="500" width="120" height="80" rx="3" fill="rgba(90,154,207,0.08)"/>
+
+          {/* Counter screens */}
+          <rect x="130" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
+          <rect x="280" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
+          <rect x="430" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
+          <rect x="710" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
+          <rect x="860" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
+          <rect x="1010" y="510" width="60" height="35" rx="2" fill="rgba(232,200,64,0.1)"/>
         </g>
 
-        {/* Longtail boat */}
-        <g opacity="0.07" stroke="currentColor" strokeWidth="0.6" fill="none" transform="translate(500, 570)">
-          <path d="M0 20 Q20 15 60 12 Q100 8 140 6 Q160 5 180 8 L200 12"/>
-          <path d="M0 20 Q20 25 60 27 Q100 28 140 26 Q160 24 180 22 L200 12"/>
-          {/* Long tail engine */}
-          <path d="M200 12 L240 5 L250 8"/>
-          <line x1="240" y1="5" x2="260" y2="3"/>
-          {/* Canopy */}
-          <path d="M60 12 L60 -5 Q90 -12 120 -5 L120 8"/>
-          {/* Person */}
-          <circle cx="180" cy="5" r="3"/>
-          <path d="M180 8 L180 16"/>
+        {/* Departure board above */}
+        <g opacity="0.15" stroke="currentColor" fill="none" strokeWidth="0.8">
+          <rect x="350" y="100" width="500" height="60" rx="4" fill="rgba(15,18,25,0.05)"/>
+          {/* Board rows */}
+          <line x1="360" y1="120" x2="840" y2="120" strokeWidth="0.3"/>
+          <line x1="360" y1="135" x2="840" y2="135" strokeWidth="0.3"/>
+          <line x1="360" y1="150" x2="840" y2="150" strokeWidth="0.3"/>
+          {/* Column dividers */}
+          <line x1="450" y1="105" x2="450" y2="155" strokeWidth="0.3"/>
+          <line x1="580" y1="105" x2="580" y2="155" strokeWidth="0.3"/>
+          <line x1="700" y1="105" x2="700" y2="155" strokeWidth="0.3"/>
         </g>
 
-        {/* Stilted houses left */}
-        <g opacity="0.05" stroke="currentColor" strokeWidth="0.5" fill="none" transform="translate(100, 480)">
-          <rect x="0" y="0" width="60" height="40" rx="1"/>
-          <path d="M-5 0 L30 -15 L65 0"/>
-          <line x1="10" y1="40" x2="10" y2="70"/>
-          <line x1="50" y1="40" x2="50" y2="70"/>
-          <rect x="20" y="10" width="12" height="15" rx="1"/>
-          <rect x="38" y="10" width="12" height="15" rx="1"/>
+        {/* Rope barriers (queue lines) */}
+        <g opacity="0.06" stroke="currentColor" strokeWidth="0.8" fill="none">
+          <line x1="200" y1="450" x2="200" y2="480"/>
+          <circle cx="200" cy="448" r="3"/>
+          <line x1="350" y1="450" x2="350" y2="480"/>
+          <circle cx="350" cy="448" r="3"/>
+          <line x1="500" y1="450" x2="500" y2="480"/>
+          <circle cx="500" cy="448" r="3"/>
+          <path d="M200 460 Q275 470 350 460" strokeDasharray="4 3"/>
+          <path d="M350 460 Q425 470 500 460" strokeDasharray="4 3"/>
         </g>
 
-        {/* Stilted houses right */}
-        <g opacity="0.05" stroke="currentColor" strokeWidth="0.5" fill="none" transform="translate(900, 470)">
-          <rect x="0" y="0" width="70" height="45" rx="1"/>
-          <path d="M-5 0 L35 -18 L75 0"/>
-          <line x1="12" y1="45" x2="12" y2="75"/>
-          <line x1="58" y1="45" x2="58" y2="75"/>
-          <rect x="15" y="12" width="14" height="18" rx="1"/>
-          <rect x="40" y="12" width="14" height="18" rx="1"/>
-        </g>
-
-        {/* Coconut palms */}
-        <g opacity="0.06" stroke="currentColor" strokeWidth="0.5" fill="none">
-          {/* Palm 1 */}
-          <path d="M80 480 Q85 420 90 380 Q92 360 88 340"/>
-          <path d="M88 340 Q80 320 65 325"/>
-          <path d="M88 340 Q95 320 110 322"/>
-          <path d="M88 340 Q82 325 75 335"/>
-          <path d="M88 340 Q94 325 102 333"/>
-          <path d="M88 340 Q88 320 88 310"/>
-
-          {/* Palm 2 */}
-          <path d="M1050 470 Q1055 410 1058 370 Q1060 350 1055 330"/>
-          <path d="M1055 330 Q1047 310 1035 315"/>
-          <path d="M1055 330 Q1063 310 1075 312"/>
-          <path d="M1055 330 Q1049 315 1042 325"/>
-          <path d="M1055 330 Q1061 315 1068 323"/>
-        </g>
-
-        {/* Small floating plants */}
-        <g opacity="0.04" stroke="currentColor" strokeWidth="0.3" fill="none">
-          <circle cx="350" cy="630" r="4"/>
-          <circle cx="355" cy="628" r="3"/>
-          <circle cx="700" cy="620" r="3"/>
-          <circle cx="705" cy="618" r="4"/>
-          <circle cx="850" cy="640" r="3"/>
+        {/* Ceiling structure */}
+        <g opacity="0.04" stroke="currentColor" strokeWidth="0.5">
+          <line x1="0" y1="50" x2="1200" y2="50"/>
+          <line x1="150" y1="0" x2="150" y2="50"/>
+          <line x1="400" y1="0" x2="400" y2="50"/>
+          <line x1="600" y1="0" x2="600" y2="50"/>
+          <line x1="800" y1="0" x2="800" y2="50"/>
+          <line x1="1050" y1="0" x2="1050" y2="50"/>
         </g>
       </svg>
     </div>
@@ -121,11 +110,11 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center px-6 relative overflow-hidden">
-      <ThaiCanalBg />
+      <CheckInBg />
       <ThemeToggle />
 
       {/* Ambient glow */}
-      <div className="absolute bottom-[-10%] left-[20%] w-[50%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--amber-glow) 0%, transparent 70%)' }} />
+      <div className="absolute top-[-10%] left-[30%] w-[40%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(ellipse, var(--amber-glow) 0%, transparent 70%)' }} />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -137,21 +126,24 @@ export default function LoginPage() {
         <div className="text-center mb-8">
           <motion.div
             className="inline-block mb-4"
-            style={{ color: 'var(--amber)' }}
+            style={{ color: 'var(--blue)' }}
             animate={{ y: [0, -5, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <PlaneIcon size={48} />
+            <AirplaneIcon size={56} />
           </motion.div>
           <h1 className="heading text-2xl font-semibold">
-            Welcome
+            Check In
           </h1>
-          <p className="text-sm mt-2" style={{ color: 'var(--ink-muted)' }}>Enter your name to continue</p>
+          <p className="text-sm mt-2" style={{ color: 'var(--ink-muted)' }}>Crew access — enter your name to proceed</p>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="card">
-          <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>Your Name</label>
+        <form onSubmit={handleSubmit} className="card relative overflow-hidden">
+          {/* Airline stripe */}
+          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4b2d8e] via-[#f58220] to-[#005baa]" />
+
+          <label className="block text-[10px] uppercase tracking-widest font-medium mb-2 mt-2 fids-font" style={{ color: 'var(--ink-muted)' }}>Crew Name</label>
           <input
             type="text"
             value={name}
@@ -167,10 +159,11 @@ export default function LoginPage() {
           )}
           <button
             type="submit"
-            className="btn-primary w-full"
+            className="btn-takeoff w-full"
             disabled={loginMutation.isPending}
           >
-            {loginMutation.isPending ? 'Entering...' : 'Enter'}
+            <span>{loginMutation.isPending ? 'Checking in...' : 'Check In'}</span>
+            <AirplaneIcon size={16} />
           </button>
         </form>
 
@@ -180,7 +173,7 @@ export default function LoginPage() {
             className="text-xs transition-opacity hover:opacity-80"
             style={{ color: 'var(--ink-muted)' }}
           >
-            Back to home
+            ← Back to terminal
           </button>
         </div>
       </motion.div>

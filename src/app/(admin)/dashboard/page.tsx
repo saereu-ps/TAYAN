@@ -7,12 +7,15 @@ import { useUserStore } from '@/stores/user-store';
 import { useEffect } from 'react';
 import { ThemeToggle } from '../../theme-provider';
 
-function PlaneIcon({ size = 64 }: { size?: number }) {
+function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M4 32L56 8L40 56L30 36L4 32Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M30 36L56 8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5"/>
-      <path d="M30 36V50L38 42" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
     </svg>
   );
 }
@@ -55,44 +58,40 @@ function UsersIcon() {
   );
 }
 
-function BangkokMapBg() {
+function FlightBoardBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Grid pattern like Bangkok streets */}
-        <g opacity="0.04" stroke="currentColor" strokeWidth="0.3">
-          {/* Horizontal roads */}
-          <line x1="0" y1="100" x2="1200" y2="100"/>
-          <line x1="0" y1="200" x2="1200" y2="200"/>
-          <line x1="0" y1="350" x2="1200" y2="350"/>
-          <line x1="0" y1="500" x2="1200" y2="500"/>
-          <line x1="0" y1="650" x2="1200" y2="650"/>
-          {/* Vertical roads */}
-          <line x1="150" y1="0" x2="150" y2="800"/>
-          <line x1="350" y1="0" x2="350" y2="800"/>
-          <line x1="550" y1="0" x2="550" y2="800"/>
-          <line x1="750" y1="0" x2="750" y2="800"/>
-          <line x1="950" y1="0" x2="950" y2="800"/>
-          {/* Diagonal (like Bangkok sois) */}
-          <line x1="200" y1="100" x2="350" y2="200"/>
-          <line x1="600" y1="200" x2="750" y2="350"/>
-          <line x1="400" y1="500" x2="550" y2="650"/>
-          <line x1="800" y1="350" x2="950" y2="500"/>
+        {/* Large departure board frame */}
+        <g opacity="0.08" stroke="currentColor" fill="none" strokeWidth="0.8">
+          {/* Board outline */}
+          <rect x="50" y="60" width="1100" height="680" rx="6"/>
+          {/* Header bar */}
+          <rect x="50" y="60" width="1100" height="40" rx="6" fill="rgba(90,154,207,0.05)"/>
+          {/* Column headers */}
+          <line x1="200" y1="60" x2="200" y2="740"/>
+          <line x1="500" y1="60" x2="500" y2="740"/>
+          <line x1="720" y1="60" x2="720" y2="740"/>
+          <line x1="900" y1="60" x2="900" y2="740"/>
+          {/* Rows */}
+          {Array.from({ length: 10 }).map((_, i) => (
+            <line key={i} x1="50" y1={140 + i * 60} x2="1150" y2={140 + i * 60} strokeWidth="0.3"/>
+          ))}
         </g>
 
-        {/* Landmark dots */}
-        <g opacity="0.08" fill="currentColor">
-          <circle cx="350" cy="200" r="4"/>
-          <circle cx="550" cy="350" r="5"/>
-          <circle cx="750" cy="500" r="4"/>
-          <circle cx="150" cy="350" r="3"/>
-          <circle cx="950" cy="200" r="4"/>
-          <circle cx="550" cy="650" r="3"/>
-          <circle cx="350" cy="500" r="3"/>
+        {/* Clock */}
+        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8">
+          <circle cx="1100" cy="30" r="18"/>
+          <line x1="1100" y1="15" x2="1100" y2="30"/>
+          <line x1="1100" y1="30" x2="1110" y2="35"/>
         </g>
 
-        {/* River curve */}
-        <path d="M400 0 Q420 100 380 200 Q340 350 400 500 Q450 650 380 800" stroke="currentColor" strokeWidth="0.5" opacity="0.06" fill="none"/>
+        {/* Small airplane decorations */}
+        <g opacity="0.06" fill="currentColor">
+          <g transform="translate(80, 75) scale(0.4)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
+          </g>
+        </g>
       </svg>
     </div>
   );
@@ -123,22 +122,25 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      <BangkokMapBg />
+      <FlightBoardBg />
       <ThemeToggle />
 
-      <div className="relative z-10 px-6 py-8 max-w-2xl mx-auto">
+      <div className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="heading text-xl font-semibold">Your Rooms</h1>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>Welcome, {userName}</p>
+            <h1 className="heading text-xl font-semibold flex items-center gap-2">
+              Flight Schedule
+              <span className="text-lg">✈️</span>
+            </h1>
+            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)' }}>Welcome, Captain {userName}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/create')}
               className="btn-primary flex items-center gap-2"
             >
-              <PlusIcon /> New Room
+              <PlusIcon /> Schedule Flight
             </button>
             <button
               onClick={() => { logout(); router.push('/'); }}
@@ -154,20 +156,31 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3 mb-8">
           <div className="card text-center py-4">
-            <p className="text-2xl font-semibold" style={{ color: 'var(--amber)' }}>{rooms.length}</p>
-            <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Total Rooms</p>
+            <p className="text-2xl font-semibold" style={{ color: 'var(--blue)' }}>{rooms.length}</p>
+            <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Total Flights</p>
           </div>
           <div className="card text-center py-4">
-            <p className="text-2xl font-semibold" style={{ color: 'var(--teal)' }}>{activeCount}</p>
-            <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Active</p>
+            <p className="text-2xl font-semibold" style={{ color: 'var(--success)' }}>{activeCount}</p>
+            <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Boarding</p>
           </div>
           <div className="card text-center py-4">
-            <p className="text-2xl font-semibold">{totalParticipants}</p>
-            <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Participants</p>
+            <p className="text-2xl font-semibold" style={{ color: 'var(--amber)' }}>{totalParticipants}</p>
+            <p className="fids-font text-[10px] mt-1 uppercase tracking-wider" style={{ color: 'var(--ink-muted)' }}>Passengers</p>
           </div>
         </div>
 
-        {/* Room List — Boarding Pass style */}
+        {/* Flight Board Table Header */}
+        {rooms.length > 0 && (
+          <div className="flex items-center px-5 py-2 mb-1 rounded-lg" style={{ background: 'var(--blue-light)' }}>
+            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20" style={{ color: 'var(--blue)' }}>Flight</span>
+            <span className="fids-font text-[9px] uppercase tracking-widest font-medium flex-1" style={{ color: 'var(--blue)' }}>Destination</span>
+            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20 text-center" style={{ color: 'var(--blue)' }}>Status</span>
+            <span className="fids-font text-[9px] uppercase tracking-widest font-medium w-20 text-center" style={{ color: 'var(--blue)' }}>Gate</span>
+            <span className="w-10" />
+          </div>
+        )}
+
+        {/* Room List as Flight Board */}
         {rooms.length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
@@ -175,52 +188,57 @@ export default function DashboardPage() {
             className="card text-center py-16"
           >
             <div className="opacity-20 mb-4 flex justify-center">
-              <PlaneIcon size={48} />
+              <AirplaneIcon size={48} />
             </div>
-            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>No rooms yet</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>Create your first room to get started</p>
+            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>No flights scheduled</p>
+            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>Schedule your first flight to get started</p>
           </motion.div>
         ) : (
-          <div className="space-y-3">
+          <div className="card overflow-hidden !p-0">
             {rooms.map((room, i) => (
               <motion.div
                 key={room.id}
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="card-boarding-pass cursor-pointer"
+                transition={{ delay: i * 0.04 }}
+                className="flight-row cursor-pointer"
                 onClick={() => router.push(`/admin/${room.id}`)}
               >
-                <div className="flex items-center justify-between px-5 py-4">
-                  <div className="flex-1 min-w-0 pl-3">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-sm font-semibold truncate">{room.name}</h3>
-                      <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
-                        {room.status}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-4 mt-1.5">
-                      <span className="text-[10px] font-mono tracking-wider" style={{ color: 'var(--ink-muted)' }}>
-                        {room.code}
-                      </span>
-                      <span className="flex items-center gap-1 text-[10px]" style={{ color: 'var(--ink-muted)' }}>
-                        <UsersIcon /> {room.participantCount} joined
-                      </span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (confirm('Delete this room?')) {
-                        deleteMutation.mutate({ id: room.id });
-                      }
-                    }}
-                    className="p-2 rounded-lg opacity-30 hover:opacity-70 transition-opacity"
-                    style={{ color: 'var(--error)' }}
-                  >
-                    <TrashIcon />
-                  </button>
-                </div>
+                {/* Flight code */}
+                <span className="fids-font text-xs font-bold tracking-wider w-20" style={{ color: 'var(--ink)' }}>
+                  {room.code}
+                </span>
+
+                {/* Destination (room name) */}
+                <span className="flex-1 text-sm font-medium truncate pr-4">
+                  {room.name}
+                </span>
+
+                {/* Status */}
+                <span className="w-20 text-center">
+                  <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
+                    {room.status === 'active' ? 'Boarding' : room.status === 'paused' ? 'Delayed' : 'Landed'}
+                  </span>
+                </span>
+
+                {/* Gate (participants) */}
+                <span className="w-20 flex items-center justify-center gap-1 text-xs" style={{ color: 'var(--ink-muted)' }}>
+                  <UsersIcon /> {room.participantCount}
+                </span>
+
+                {/* Delete */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirm('Cancel this flight?')) {
+                      deleteMutation.mutate({ id: room.id });
+                    }
+                  }}
+                  className="w-10 flex justify-end p-1 rounded opacity-30 hover:opacity-70 transition-opacity"
+                  style={{ color: 'var(--error)' }}
+                >
+                  <TrashIcon />
+                </button>
               </motion.div>
             ))}
           </div>

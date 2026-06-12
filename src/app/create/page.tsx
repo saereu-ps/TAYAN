@@ -7,6 +7,19 @@ import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
 import { ThemeToggle } from '../theme-provider';
 
+function AirplaneIcon({ size = 64, className = '' }: { size?: number; className?: string }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" className={className} xmlns="http://www.w3.org/2000/svg">
+      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z" 
+        fill="currentColor" stroke="currentColor" strokeWidth="1" strokeLinejoin="round"/>
+      <circle cx="38" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="42" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="46" cy="31" r="1" fill="white" opacity="0.6"/>
+      <circle cx="50" cy="31" r="1" fill="white" opacity="0.6"/>
+    </svg>
+  );
+}
+
 function BackIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
@@ -15,88 +28,49 @@ function BackIcon() {
   );
 }
 
-function YiPengLanternsBg() {
+function ScheduleBoardBg() {
   return (
     <div className="svg-bg">
       <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        {/* Floating lanterns — Yi Peng style */}
-        <g opacity="0.06" stroke="currentColor" strokeWidth="0.5" fill="none">
-          {/* Lantern 1 */}
-          <g transform="translate(150, 100)">
-            <ellipse cx="0" cy="0" rx="18" ry="25"/>
-            <path d="M-12 -20 Q0 -30 12 -20"/>
-            <path d="M-8 25 L-5 35 L5 35 L8 25"/>
-            <line x1="0" y1="35" x2="0" y2="45"/>
-          </g>
+        {/* Airport runway pattern */}
+        <g opacity="0.08" stroke="currentColor" fill="none" strokeWidth="0.6">
+          {/* Taxiway lines */}
+          <path d="M0 700 L300 700 Q350 700 350 650 L350 400" strokeDasharray="10 8"/>
+          <path d="M600 800 L600 500 Q600 450 650 450 L1200 450" strokeDasharray="10 8"/>
+          {/* Runway outline */}
+          <rect x="800" y="100" width="60" height="600" rx="4"/>
+          <line x1="830" y1="120" x2="830" y2="680" strokeDasharray="25 15" strokeWidth="1.5"/>
+          {/* Threshold markings */}
+          <line x1="810" y1="130" x2="810" y2="180" strokeWidth="2"/>
+          <line x1="820" y1="130" x2="820" y2="180" strokeWidth="2"/>
+          <line x1="840" y1="130" x2="840" y2="180" strokeWidth="2"/>
+          <line x1="850" y1="130" x2="850" y2="180" strokeWidth="2"/>
+        </g>
 
-          {/* Lantern 2 */}
-          <g transform="translate(400, 180)">
-            <ellipse cx="0" cy="0" rx="15" ry="22"/>
-            <path d="M-10 -17 Q0 -25 10 -17"/>
-            <path d="M-7 22 L-4 30 L4 30 L7 22"/>
-            <line x1="0" y1="30" x2="0" y2="38"/>
-          </g>
+        {/* Gate assignments */}
+        <g opacity="0.06" fill="currentColor" fontSize="10" fontFamily="monospace">
+          <text x="100" y="200">A1</text>
+          <text x="100" y="300">A2</text>
+          <text x="100" y="400">A3</text>
+          <text x="200" y="200">B1</text>
+          <text x="200" y="300">B2</text>
+        </g>
 
-          {/* Lantern 3 */}
-          <g transform="translate(700, 80)">
-            <ellipse cx="0" cy="0" rx="20" ry="28"/>
-            <path d="M-14 -22 Q0 -33 14 -22"/>
-            <path d="M-9 28 L-6 38 L6 38 L9 28"/>
-            <line x1="0" y1="38" x2="0" y2="48"/>
+        {/* Aircraft silhouettes at gates */}
+        <g opacity="0.06" fill="currentColor">
+          <g transform="translate(130, 220) scale(0.35) rotate(90)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
           </g>
-
-          {/* Lantern 4 */}
-          <g transform="translate(950, 150)">
-            <ellipse cx="0" cy="0" rx="16" ry="23"/>
-            <path d="M-11 -18 Q0 -27 11 -18"/>
-            <path d="M-7 23 L-4 31 L4 31 L7 23"/>
-            <line x1="0" y1="31" x2="0" y2="39"/>
-          </g>
-
-          {/* Lantern 5 */}
-          <g transform="translate(250, 350)">
-            <ellipse cx="0" cy="0" rx="14" ry="20"/>
-            <path d="M-9 -16 Q0 -23 9 -16"/>
-            <path d="M-6 20 L-4 27 L4 27 L6 20"/>
-            <line x1="0" y1="27" x2="0" y2="34"/>
-          </g>
-
-          {/* Lantern 6 */}
-          <g transform="translate(850, 320)">
-            <ellipse cx="0" cy="0" rx="17" ry="24"/>
-            <path d="M-12 -19 Q0 -28 12 -19"/>
-            <path d="M-8 24 L-5 33 L5 33 L8 24"/>
-            <line x1="0" y1="33" x2="0" y2="42"/>
-          </g>
-
-          {/* Lantern 7 */}
-          <g transform="translate(550, 450)">
-            <ellipse cx="0" cy="0" rx="13" ry="19"/>
-            <path d="M-9 -15 Q0 -22 9 -15"/>
-            <path d="M-6 19 L-4 26 L4 26 L6 19"/>
-            <line x1="0" y1="26" x2="0" y2="33"/>
-          </g>
-
-          {/* Lantern 8 — large, distant */}
-          <g transform="translate(1100, 500)">
-            <ellipse cx="0" cy="0" rx="12" ry="17"/>
-            <path d="M-8 -13 Q0 -20 8 -13"/>
-            <path d="M-5 17 L-3 23 L3 23 L5 17"/>
-            <line x1="0" y1="23" x2="0" y2="29"/>
+          <g transform="translate(230, 320) scale(0.3) rotate(90)">
+            <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"/>
           </g>
         </g>
 
-        {/* Small stars / sparks */}
-        <g opacity="0.04" fill="currentColor">
-          <circle cx="180" cy="60" r="1.5"/>
-          <circle cx="430" cy="140" r="1"/>
-          <circle cx="720" cy="50" r="1.5"/>
-          <circle cx="980" cy="110" r="1"/>
-          <circle cx="300" cy="300" r="1"/>
-          <circle cx="600" cy="250" r="1.5"/>
-          <circle cx="1000" cy="350" r="1"/>
-          <circle cx="100" cy="450" r="1.5"/>
-          <circle cx="750" cy="400" r="1"/>
+        {/* Wind sock */}
+        <g opacity="0.1" stroke="currentColor" fill="none" strokeWidth="0.8" transform="translate(1050, 150)">
+          <line x1="0" y1="0" x2="0" y2="60"/>
+          <path d="M0 0 L30 5 L30 -5 Z" fill="rgba(232,50,50,0.3)"/>
+          <path d="M0 0 L30 5 L25 10" strokeWidth="0.5"/>
         </g>
       </svg>
     </div>
@@ -126,7 +100,7 @@ export default function CreateRoomPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      setError('Room name is required');
+      setError('Destination name is required');
       return;
     }
     if (!userId) return;
@@ -142,7 +116,7 @@ export default function CreateRoomPage() {
 
   return (
     <div className="min-h-screen px-6 py-8 relative overflow-hidden">
-      <YiPengLanternsBg />
+      <ScheduleBoardBg />
       <ThemeToggle />
 
       <div className="relative z-10 max-w-lg mx-auto">
@@ -152,7 +126,7 @@ export default function CreateRoomPage() {
           className="flex items-center gap-2 text-sm mb-8 transition-opacity hover:opacity-80"
           style={{ color: 'var(--ink-muted)' }}
         >
-          <BackIcon /> Back to dashboard
+          <BackIcon /> Back to flight schedule
         </button>
 
         <motion.div
@@ -160,55 +134,72 @@ export default function CreateRoomPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="heading text-xl font-semibold mb-6">Create New Room</h1>
+          <div className="flex items-center gap-3 mb-6">
+            <h1 className="heading text-xl font-semibold">Schedule New Flight</h1>
+            <motion.div
+              style={{ color: 'var(--blue)' }}
+              animate={{ x: [0, 4, 0] }}
+              transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              <AirplaneIcon size={24} />
+            </motion.div>
+          </div>
 
-          <form onSubmit={handleSubmit} className="card space-y-5">
-            {/* Room Name */}
-            <div>
-              <label className="block text-xs font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>Room Name</label>
+          <form onSubmit={handleSubmit} className="card relative overflow-hidden space-y-5">
+            {/* Airline stripe */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#76b82a] via-[#ffd100] to-[#f58220]" />
+
+            {/* Destination (Room Name) */}
+            <div className="mt-2">
+              <label className="block fids-font text-[10px] uppercase tracking-widest font-medium mb-2" style={{ color: 'var(--ink-muted)' }}>Destination</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Team Standup Q and A"
+                placeholder="e.g. Team Standup Q&A"
                 className="input-zen"
                 autoFocus
               />
+              <p className="text-[10px] mt-1.5" style={{ color: 'var(--ink-muted)' }}>
+                This is the room name passengers will see
+              </p>
             </div>
 
-            {/* Identity Mode */}
+            {/* Flight Type (Identity Mode) */}
             <div>
-              <label className="block text-xs font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>Identity Mode</label>
+              <label className="block fids-font text-[10px] uppercase tracking-widest font-medium mb-3" style={{ color: 'var(--ink-muted)' }}>Flight Type</label>
               <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setIdentityMode('anonymous')}
-                  className="flex-1 p-3 rounded-xl text-sm text-center transition-all"
+                  className="flex-1 p-4 rounded-xl text-center transition-all border-2"
                   style={{
-                    background: identityMode === 'anonymous' ? 'var(--amber)' : 'var(--paper)',
-                    color: identityMode === 'anonymous' ? '#fff' : 'var(--ink)',
-                    border: `1.5px solid ${identityMode === 'anonymous' ? 'var(--amber)' : 'var(--border)'}`,
+                    background: identityMode === 'anonymous' ? 'var(--blue-light)' : 'transparent',
+                    borderColor: identityMode === 'anonymous' ? 'var(--blue)' : 'var(--border)',
+                    color: identityMode === 'anonymous' ? 'var(--blue)' : 'var(--ink)',
                   }}
                 >
-                  Anonymous
+                  <p className="text-sm font-semibold">Anonymous</p>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>No ID check</p>
                 </button>
                 <button
                   type="button"
                   onClick={() => setIdentityMode('identified')}
-                  className="flex-1 p-3 rounded-xl text-sm text-center transition-all"
+                  className="flex-1 p-4 rounded-xl text-center transition-all border-2"
                   style={{
-                    background: identityMode === 'identified' ? 'var(--amber)' : 'var(--paper)',
-                    color: identityMode === 'identified' ? '#fff' : 'var(--ink)',
-                    border: `1.5px solid ${identityMode === 'identified' ? 'var(--amber)' : 'var(--border)'}`,
+                    background: identityMode === 'identified' ? 'var(--blue-light)' : 'transparent',
+                    borderColor: identityMode === 'identified' ? 'var(--blue)' : 'var(--border)',
+                    color: identityMode === 'identified' ? 'var(--blue)' : 'var(--ink)',
                   }}
                 >
-                  Identified
+                  <p className="text-sm font-semibold">Identified</p>
+                  <p className="text-[10px] mt-1" style={{ color: 'var(--ink-muted)' }}>Name required</p>
                 </button>
               </div>
-              <p className="text-xs mt-2" style={{ color: 'var(--ink-muted)' }}>
+              <p className="text-[10px] mt-2" style={{ color: 'var(--ink-muted)' }}>
                 {identityMode === 'anonymous'
-                  ? 'Participants can send messages without revealing their name'
-                  : 'Participants must provide their name when sending'}
+                  ? 'Passengers can board without showing ID — messages are anonymous'
+                  : 'Passengers must provide their name at the gate'}
               </p>
             </div>
 
@@ -220,10 +211,11 @@ export default function CreateRoomPage() {
 
             <button
               type="submit"
-              className="btn-primary w-full"
+              className="btn-takeoff w-full"
               disabled={createMutation.isPending}
             >
-              {createMutation.isPending ? 'Creating...' : 'Create Room'}
+              <span>{createMutation.isPending ? 'Scheduling...' : 'Schedule Flight'}</span>
+              <AirplaneIcon size={18} />
             </button>
           </form>
         </motion.div>
