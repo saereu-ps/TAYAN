@@ -1,96 +1,53 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { trpc } from '@/lib/trpc';
 import { useUserStore } from '@/stores/user-store';
-import { ThemeToggle, useTheme } from '../../theme-provider';
+import { ThemeToggle } from '../../theme-provider';
 
-function AirplaneIcon({ size = 120 }: { size?: number }) {
-  return (
-    <svg width={size} height={size * 0.5} viewBox="0 0 200 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M20 48 Q30 38 60 36 L170 36 Q185 36 192 42 Q198 48 192 54 Q185 60 170 60 L60 60 Q30 58 20 48Z" fill="#f0ebe0"/>
-      <path d="M30 52 Q60 62 120 62 Q160 62 185 56 Q190 54 188 52 L170 60 L60 60 Q35 58 30 52Z" fill="#d4d0c8" opacity="0.5"/>
-      <path d="M40 46 L180 46 L180 48 L40 48Z" fill="#4b2d8e"/>
-      <path d="M40 48 L180 48 L180 49 L40 49Z" fill="#c4a44e"/>
-      <path d="M28 48 L20 20 L40 22 L42 40Z" fill="#4b2d8e"/>
-      <path d="M24 30 L36 32 L36 34 L25 33Z" fill="#c4a44e"/>
-      <path d="M22 46 L10 38 L18 37 L30 44Z" fill="#d8d4cc"/>
-      <path d="M22 50 L10 58 L18 59 L30 52Z" fill="#d8d4cc"/>
-      <path d="M80 55 L65 88 L130 88 L115 55Z" fill="#c8c4bc"/>
-      <path d="M80 52 L68 80 L125 80 L112 52Z" fill="#d8d4cc"/>
-      <ellipse cx="88" cy="82" rx="7" ry="5" fill="#8a8680"/>
-      <ellipse cx="88" cy="82" rx="4.5" ry="3" fill="#3a3a3a"/>
-      <ellipse cx="112" cy="82" rx="7" ry="5" fill="#8a8680"/>
-      <ellipse cx="112" cy="82" rx="4.5" ry="3" fill="#3a3a3a"/>
-      <path d="M182 40 Q190 44 190 48 Q190 52 182 56" fill="#5a9ad5" opacity="0.7"/>
-      <path d="M183 42 Q188 45 188 48 Q188 51 183 54" fill="#3a7ab5" opacity="0.5"/>
-      <g fill="#5b9bd5" opacity="0.6">
-        <rect x="55" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="62" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="69" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="76" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="83" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="90" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="97" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="104" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="111" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="118" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="125" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="132" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="139" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="146" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="153" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="160" y="42" width="3" height="5" rx="1.5"/>
-        <rect x="167" y="42" width="3" height="5" rx="1.5"/>
-      </g>
-      <line x1="52" y1="37" x2="52" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
-      <line x1="100" y1="37" x2="100" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
-      <line x1="150" y1="37" x2="150" y2="59" stroke="#b8b4ac" strokeWidth="0.5"/>
-    </svg>
-  );
+// --- Types ---
+interface PaperPlane {
+  id: string;
+  content: string;
+  senderName?: string | null;
+  createdAt: string | Date;
+  isBroadcasted?: boolean;
+  isPinned?: boolean;
 }
 
-function SmallPlaneIcon({ size = 20 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 64 64" fill="none">
-      <path d="M58 30H42L30 18H26L30 30H16L12 26H8L12 32L8 38H12L16 34H30L26 46H30L42 34H58C60 34 62 33 62 32C62 31 60 30 58 30Z"
-        fill="currentColor"/>
-    </svg>
-  );
-}
+// --- Constants ---
+const GATES = [
+  { id: 1, x: 10, y: 12 },
+  { id: 2, x: 25, y: 12 },
+  { id: 3, x: 40, y: 12 },
+  { id: 4, x: 55, y: 12 },
+  { id: 5, x: 10, y: 78 },
+  { id: 6, x: 25, y: 78 },
+  { id: 7, x: 40, y: 78 },
+  { id: 8, x: 55, y: 78 },
+];
 
+const COLORS = {
+  tarmac: '#4a6070',
+  runway: '#3a5060',
+  runwayMarking: '#ffffff',
+  grass: '#5b9bd5',
+  gateBuilding: '#2a5a6a',
+  planeBody: '#f0ebe0',
+  planeTail: '#4b2d8e',
+  planeAccent: '#c4a44e',
+  unreadGlow: '#e87060',
+  cardBg: 'rgba(255,255,255,0.97)',
+  text: '#1a2a3a',
+};
+
+// --- SVG Icons ---
 function BackIcon() {
   return (
     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
       <path d="M19 12H5M12 19l-7-7 7-7" />
-    </svg>
-  );
-}
-
-function BroadcastIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <path d="M12 17v5" />
-      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1V3H8v3h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
-    </svg>
-  );
-}
-
-function TrashIcon() {
-  return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <polyline points="3,6 5,6 21,6" />
-      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
     </svg>
   );
 }
@@ -115,68 +72,283 @@ function UsersIcon() {
   );
 }
 
-function RadarBg() {
-  const { theme } = useTheme();
-  const isNight = theme === 'night';
-
-  const skyColor = isNight ? '#1a2040' : '#4a8ac5';
-  const radarStroke = isNight ? '#4a5a7a' : '#f0ebe0';
-  const blipColor = isNight ? '#4a5a7a' : '#f0ebe0';
-
+function BroadcastIcon() {
   return (
-    <div className="svg-bg">
-      <svg viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
-        <rect width="1200" height="800" fill={skyColor}/>
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+    </svg>
+  );
+}
 
-        {/* Stars (night only) */}
-        {isNight && (
-          <g>
-            <circle cx="80" cy="50" r="1" fill="#ffffff" opacity="0.4"/>
-            <circle cx="200" cy="80" r="1.5" fill="#ffffff" opacity="0.5"/>
-            <circle cx="350" cy="40" r="1" fill="#ffffff" opacity="0.3"/>
-            <circle cx="500" cy="70" r="2" fill="#ffffff" opacity="0.4"/>
-            <circle cx="700" cy="50" r="1.5" fill="#ffffff" opacity="0.6"/>
-            <circle cx="900" cy="80" r="1" fill="#ffffff" opacity="0.5"/>
-            <circle cx="1050" cy="60" r="2" fill="#ffffff" opacity="0.3"/>
-            <circle cx="1150" cy="90" r="1" fill="#ffffff" opacity="0.4"/>
-            <circle cx="150" cy="150" r="1.5" fill="#ffffff" opacity="0.3"/>
-            <circle cx="1000" cy="150" r="1" fill="#ffffff" opacity="0.5"/>
-          </g>
-        )}
+function PinIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <path d="M12 17v5" />
+      <path d="M5 17h14v-1.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1V3H8v3h1v4.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V17z" />
+    </svg>
+  );
+}
 
-        {/* Concentric radar circles */}
-        <circle cx="600" cy="400" r="100" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="200" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="300" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="400" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
-        <circle cx="600" cy="400" r="500" stroke={radarStroke} strokeWidth="1" fill="none" opacity="0.15"/>
+function TrashIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+      <polyline points="3,6 5,6 21,6" />
+      <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+    </svg>
+  );
+}
 
-        {/* Crosshairs */}
-        <line x1="600" y1="0" x2="600" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.1"/>
-        <line x1="0" y1="400" x2="1200" y2="400" stroke={radarStroke} strokeWidth="0.5" opacity="0.1"/>
-        <line x1="175" y1="0" x2="1025" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.08"/>
-        <line x1="1025" y1="0" x2="175" y2="800" stroke={radarStroke} strokeWidth="0.5" opacity="0.08"/>
+function CloseIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M18 6L6 18M6 6l12 12" />
+    </svg>
+  );
+}
 
-        {/* Radar blips */}
-        <circle cx="450" cy="250" r="4" fill={blipColor} opacity="0.25"/>
-        <circle cx="750" cy="320" r="3" fill={blipColor} opacity="0.2"/>
-        <circle cx="380" cy="500" r="3" fill={blipColor} opacity="0.2"/>
-        <circle cx="820" cy="480" r="4" fill={blipColor} opacity="0.25"/>
-        <circle cx="550" cy="180" r="2.5" fill={blipColor} opacity="0.18"/>
-        <circle cx="700" cy="600" r="3" fill={blipColor} opacity="0.2"/>
-      </svg>
+// --- Top-Down Plane SVG ---
+function PlaneTopDown({ isRead, size = 40 }: { isRead: boolean; size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 40 40" fill="none">
+      {/* Body */}
+      <ellipse cx="20" cy="20" rx="4" ry="16" fill={isRead ? '#c8c4bc' : '#f0ebe0'} />
+      {/* Wings */}
+      <path d="M20 16 L6 20 L20 22Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
+      <path d="M20 16 L34 20 L20 22Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
+      {/* Tail */}
+      <path d="M20 34 L16 38 L20 36 L24 38Z" fill={isRead ? '#6a6060' : '#4b2d8e'} />
+      {/* Tail wings */}
+      <path d="M20 33 L14 35 L20 34Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
+      <path d="M20 33 L26 35 L20 34Z" fill={isRead ? '#8a8680' : '#2a5a6a'} />
+      {/* Gold stripe */}
+      {!isRead && <line x1="20" y1="6" x2="20" y2="34" stroke="#c4a44e" strokeWidth="0.8" />}
+      {/* Cockpit */}
+      <ellipse cx="20" cy="6" rx="2.5" ry="3" fill={isRead ? '#8a8a8a' : '#5b9bd5'} />
+    </svg>
+  );
+}
+
+// --- Tarmac Layout (Background) ---
+function TarmacLayout() {
+  return (
+    <div className="absolute inset-0 overflow-hidden" style={{ background: COLORS.tarmac }}>
+      {/* Grass border top */}
+      <div className="absolute top-0 left-0 right-0 h-[3%]" style={{ background: COLORS.grass, opacity: 0.3 }} />
+      {/* Grass border bottom */}
+      <div className="absolute bottom-0 left-0 right-0 h-[3%]" style={{ background: COLORS.grass, opacity: 0.3 }} />
+
+      {/* Gate buildings - top row */}
+      {GATES.filter(g => g.y < 50).map(gate => (
+        <div
+          key={`building-${gate.id}`}
+          className="absolute flex flex-col items-center"
+          style={{ left: `${gate.x}%`, top: `${gate.y - 6}%`, transform: 'translateX(-50%)' }}
+        >
+          <div
+            className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
+            style={{ background: COLORS.gateBuilding }}
+          >
+            G{gate.id}
+          </div>
+          {/* T-shaped marking */}
+          <div className="w-[2px] h-3 mt-0.5" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+          <div className="w-6 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+        </div>
+      ))}
+
+      {/* Gate buildings - bottom row */}
+      {GATES.filter(g => g.y >= 50).map(gate => (
+        <div
+          key={`building-${gate.id}`}
+          className="absolute flex flex-col items-center"
+          style={{ left: `${gate.x}%`, bottom: `${100 - gate.y - 6}%`, transform: 'translateX(-50%)' }}
+        >
+          {/* T-shaped marking (inverted) */}
+          <div className="w-6 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+          <div className="w-[2px] h-3 mb-0.5" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+          <div
+            className="rounded-sm text-[9px] font-bold text-white px-2 py-0.5 tracking-wider"
+            style={{ background: COLORS.gateBuilding }}
+          >
+            G{gate.id}
+          </div>
+        </div>
+      ))}
+
+      {/* Taxiway - top */}
+      <div
+        className="absolute left-[5%] right-[30%] h-[2px]"
+        style={{ top: '35%', background: COLORS.runwayMarking, opacity: 0.2 }}
+      />
+      {/* Taxiway - bottom */}
+      <div
+        className="absolute left-[5%] right-[30%] h-[2px]"
+        style={{ top: '62%', background: COLORS.runwayMarking, opacity: 0.2 }}
+      />
+
+      {/* Runway */}
+      <div
+        className="absolute left-[5%] right-[5%]"
+        style={{ top: '44%', height: '12%', background: COLORS.runway, borderRadius: '4px' }}
+      >
+        {/* Center dashes */}
+        <div className="absolute top-1/2 left-[3%] right-[3%] flex items-center justify-between -translate-y-1/2">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div
+              key={i}
+              className="h-[2px] flex-1 mx-1"
+              style={{ background: COLORS.runwayMarking, opacity: 0.7 }}
+            />
+          ))}
+        </div>
+        {/* Runway threshold markings */}
+        <div className="absolute left-[3%] top-[20%] bottom-[20%] flex flex-col justify-between">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="w-4 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+          ))}
+        </div>
+        <div className="absolute right-[3%] top-[20%] bottom-[20%] flex flex-col justify-between">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="w-4 h-[2px]" style={{ background: COLORS.runwayMarking, opacity: 0.5 }} />
+          ))}
+        </div>
+      </div>
+
+      {/* Wind sock indicator */}
+      <div className="absolute right-[8%] top-[6%] flex items-center gap-1">
+        <div className="w-[2px] h-5 bg-white opacity-40" />
+        <div className="w-3 h-2 opacity-40" style={{ background: COLORS.unreadGlow, clipPath: 'polygon(0 0, 100% 25%, 100% 75%, 0 100%)' }} />
+      </div>
     </div>
   );
 }
 
+// --- Message Modal ---
+function MessageModal({
+  plane,
+  onClose,
+  onBroadcast,
+  onUnbroadcast,
+  onPin,
+  onRemove,
+}: {
+  plane: PaperPlane;
+  onClose: () => void;
+  onBroadcast: () => void;
+  onUnbroadcast: () => void;
+  onPin: () => void;
+  onRemove: () => void;
+}) {
+  return (
+    <motion.div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+    >
+      {/* Backdrop */}
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={onClose} />
+
+      {/* Card */}
+      <motion.div
+        className="relative w-full max-w-md rounded-2xl shadow-2xl p-6"
+        style={{ background: COLORS.cardBg, color: COLORS.text }}
+        initial={{ scale: 0.9, y: 20 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.9, y: 20 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+      >
+        {/* Close button */}
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 opacity-40 hover:opacity-100 transition-opacity"
+        >
+          <CloseIcon />
+        </button>
+
+        {/* Flight ID */}
+        <div className="flex items-center gap-2 mb-1">
+          <span className="text-[10px] font-bold tracking-wider font-mono" style={{ color: COLORS.gateBuilding }}>
+            FLIGHT {plane.id.slice(-6).toUpperCase()}
+          </span>
+        </div>
+
+        {/* Sender & Time */}
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xs" style={{ opacity: 0.6 }}>
+            {plane.senderName || 'Anonymous Passenger'}
+          </span>
+          <span className="text-xs" style={{ opacity: 0.4 }}>
+            {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+
+        {/* Message content */}
+        <div className="rounded-xl p-4 mb-5" style={{ background: '#f5f3ef' }}>
+          <p className="text-sm leading-relaxed" style={{ color: COLORS.text }}>
+            {plane.content}
+          </p>
+        </div>
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={plane.isBroadcasted ? onUnbroadcast : onBroadcast}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+            style={{
+              background: plane.isBroadcasted ? COLORS.unreadGlow : 'transparent',
+              color: plane.isBroadcasted ? '#fff' : COLORS.unreadGlow,
+              border: `1.5px solid ${COLORS.unreadGlow}`,
+            }}
+          >
+            <BroadcastIcon />
+            {plane.isBroadcasted ? 'On Air' : 'Broadcast'}
+          </button>
+
+          <button
+            onClick={onPin}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+            style={{
+              background: plane.isPinned ? '#e89040' : 'transparent',
+              color: plane.isPinned ? '#fff' : '#e89040',
+              border: '1.5px solid #e89040',
+            }}
+          >
+            <PinIcon />
+            {plane.isPinned ? 'Pinned' : 'Pin'}
+          </button>
+
+          <button
+            onClick={onRemove}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium transition-all"
+            style={{
+              background: 'transparent',
+              color: '#c04040',
+              border: '1.5px solid #c04040',
+            }}
+          >
+            <TrashIcon />
+            Remove
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
+// --- Main Page Component ---
 export default function AdminRoomPage() {
   const router = useRouter();
   const params = useParams();
   const roomId = params.roomId as string;
   const { userId } = useUserStore();
-  const [seenIds, setSeenIds] = useState<Set<string>>(new Set());
-  const [newPlaneIds, setNewPlaneIds] = useState<Set<string>>(new Set());
+
+  const [readIds, setReadIds] = useState<Set<string>>(new Set());
+  const [gateAssignments, setGateAssignments] = useState<Map<string, number>>(new Map());
+  const [selectedPlane, setSelectedPlane] = useState<PaperPlane | null>(null);
+  const [landingPlanes, setLandingPlanes] = useState<Set<string>>(new Set());
   const [copied, setCopied] = useState(false);
+  const prevPlaneIdsRef = useRef<Set<string>>(new Set());
   const initialLoadRef = useRef(true);
 
   useEffect(() => {
@@ -199,36 +371,96 @@ export default function AdminRoomPage() {
     onSuccess: () => planesQuery.refetch(),
   });
   const removeMutation = trpc.plane.remove.useMutation({
-    onSuccess: () => planesQuery.refetch(),
+    onSuccess: () => {
+      planesQuery.refetch();
+      if (selectedPlane) setSelectedPlane(null);
+    },
   });
+
+  // Assign gates and detect new planes
+  const assignGate = useCallback((planeId: string, currentAssignments: Map<string, number>): number => {
+    const occupiedGates = new Set(currentAssignments.values());
+    for (const gate of GATES) {
+      if (!occupiedGates.has(gate.id)) {
+        return gate.id;
+      }
+    }
+    // Overflow: cycle through gates
+    return (currentAssignments.size % GATES.length) + 1;
+  }, []);
 
   useEffect(() => {
     if (!planesQuery.data) return;
+
+    const currentIds = new Set(planesQuery.data.map((p) => p.id));
+
     if (initialLoadRef.current) {
-      const ids = new Set(planesQuery.data.map((p) => p.id));
-      setSeenIds(ids);
+      // On first load, assign all planes to gates (no animation)
+      const assignments = new Map<string, number>();
+      planesQuery.data.forEach((plane) => {
+        const gateId = assignGate(plane.id, assignments);
+        assignments.set(plane.id, gateId);
+      });
+      setGateAssignments(assignments);
+      prevPlaneIdsRef.current = currentIds;
       initialLoadRef.current = false;
       return;
     }
-    const incoming = new Set<string>();
-    planesQuery.data.forEach((p) => {
-      if (!seenIds.has(p.id)) {
-        incoming.add(p.id);
-        seenIds.add(p.id);
+
+    // Detect new planes
+    const newIds: string[] = [];
+    currentIds.forEach((id) => {
+      if (!prevPlaneIdsRef.current.has(id)) {
+        newIds.push(id);
       }
     });
-    if (incoming.size > 0) {
-      setNewPlaneIds((prev) => new Set([...prev, ...incoming]));
-      setSeenIds(new Set(seenIds));
-      setTimeout(() => {
-        setNewPlaneIds((prev) => {
+
+    // Detect removed planes
+    const removedIds: string[] = [];
+    prevPlaneIdsRef.current.forEach((id) => {
+      if (!currentIds.has(id)) {
+        removedIds.push(id);
+      }
+    });
+
+    if (newIds.length > 0 || removedIds.length > 0) {
+      setGateAssignments((prev) => {
+        const next = new Map(prev);
+        // Free gates from removed planes
+        removedIds.forEach((id) => next.delete(id));
+        // Assign new planes to gates
+        newIds.forEach((id) => {
+          const gateId = assignGate(id, next);
+          next.set(id, gateId);
+        });
+        return next;
+      });
+
+      // Trigger landing animation for new planes
+      if (newIds.length > 0) {
+        setLandingPlanes((prev) => {
           const next = new Set(prev);
-          incoming.forEach((id) => next.delete(id));
+          newIds.forEach((id) => next.add(id));
           return next;
         });
-      }, 1500);
+        // Clear landing state after animation
+        setTimeout(() => {
+          setLandingPlanes((prev) => {
+            const next = new Set(prev);
+            newIds.forEach((id) => next.delete(id));
+            return next;
+          });
+        }, 2500);
+      }
     }
-  }, [planesQuery.data]);
+
+    prevPlaneIdsRef.current = currentIds;
+  }, [planesQuery.data, assignGate]);
+
+  const handlePlaneClick = (plane: PaperPlane) => {
+    setSelectedPlane(plane);
+    setReadIds((prev) => new Set([...prev, plane.id]));
+  };
 
   const copyCode = () => {
     if (roomQuery.data) {
@@ -241,152 +473,170 @@ export default function AdminRoomPage() {
   if (!userId) return null;
 
   const room = roomQuery.data;
-  const planes = planesQuery.data ?? [];
+  const planes = (planesQuery.data ?? []) as PaperPlane[];
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
-      <RadarBg />
-      <ThemeToggle />
+    <div className="h-screen w-screen relative overflow-hidden select-none">
+      {/* Tarmac Background */}
+      <TarmacLayout />
 
-      <div className="relative z-10 px-6 py-8 max-w-3xl mx-auto">
-        {/* Header */}
-        <div className="flex items-start gap-4 mb-8">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="mt-1 opacity-60 hover:opacity-100 transition-opacity"
-            style={{ color: 'var(--ink)' }}
-          >
-            <BackIcon />
-          </button>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3">
-              <h1 className="heading text-xl font-semibold truncate">Control Tower</h1>
-              <SmallPlaneIcon size={20} />
-            </div>
-            <p className="text-sm mt-0.5" style={{ color: 'var(--ink-muted)' }}>{room?.name ?? 'Loading...'}</p>
-            {room && (
-              <div className="flex flex-wrap items-center gap-3 mt-2">
-                <button
-                  onClick={copyCode}
-                  className="flex items-center gap-1.5 text-xs transition-all hover:opacity-80"
-                  style={{ color: 'var(--ink-muted)' }}
-                >
-                  <span className="fids-font font-mono tracking-wider">{room.code}</span>
-                  <CopyIcon />
-                  {copied && <span className="text-[10px]" style={{ color: 'var(--success)' }}>Copied</span>}
-                </button>
-                <span className={`badge-${room.status === 'active' ? 'active' : room.status === 'paused' ? 'paused' : 'closed'}`}>
-                  {room.status}
-                </span>
-                <span className="flex items-center gap-1 text-xs" style={{ color: 'var(--ink-muted)' }}>
-                  <UsersIcon /> {room.participantCount} passengers
-                </span>
-              </div>
-            )}
-          </div>
+      {/* Theme Toggle */}
+      <div className="absolute top-4 right-4 z-30">
+        <ThemeToggle />
+      </div>
+
+      {/* Header Bar */}
+      <div
+        className="absolute top-0 left-0 right-0 z-20 flex items-center gap-3 px-4 py-3"
+        style={{ background: 'rgba(26,42,58,0.85)', backdropFilter: 'blur(8px)' }}
+      >
+        <button
+          onClick={() => router.push('/dashboard')}
+          className="text-white/60 hover:text-white transition-colors"
+        >
+          <BackIcon />
+        </button>
+
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <h1 className="text-white text-sm font-semibold tracking-wide truncate">
+            Control Tower
+          </h1>
+          {room && (
+            <>
+              <span className="text-white/30">|</span>
+              <span className="text-white/80 text-xs truncate">{room.name}</span>
+              <span className="text-white/30">|</span>
+              <button
+                onClick={copyCode}
+                className="flex items-center gap-1 text-white/60 hover:text-white transition-colors"
+              >
+                <span className="font-mono text-xs tracking-wider">{room.code}</span>
+                <CopyIcon />
+              </button>
+              {copied && <span className="text-[10px] text-green-400">Copied</span>}
+              <span className={`ml-2 text-[10px] px-1.5 py-0.5 rounded font-medium ${
+                room.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                room.status === 'paused' ? 'bg-yellow-500/20 text-yellow-400' :
+                'bg-red-500/20 text-red-400'
+              }`}>
+                {room.status}
+              </span>
+            </>
+          )}
         </div>
 
-        {/* Feed header */}
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="fids-font text-sm font-medium" style={{ color: 'var(--ink-muted)' }}>
-            Incoming Flights ({planes.length})
-          </h2>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: 'var(--success)' }} />
-            <span className="fids-font text-[10px]" style={{ color: 'var(--ink-muted)' }}>Radar Active</span>
-          </div>
-        </div>
-
-        {/* Planes Feed */}
-        {planes.length === 0 ? (
-          <div className="card text-center py-16">
-            <div className="opacity-20 mb-4 flex justify-center">
-              <AirplaneIcon size={100} />
-            </div>
-            <p className="text-sm" style={{ color: 'var(--ink-muted)' }}>Airspace clear -- no incoming flights</p>
-            <p className="text-xs mt-1" style={{ color: 'var(--ink-muted)', opacity: 0.6 }}>
-              Share code <span className="fids-font font-mono tracking-wider">{room?.code}</span> with passengers
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <AnimatePresence>
-              {planes.map((plane) => {
-                const isNew = newPlaneIds.has(plane.id);
-                return (
-                  <motion.div
-                    key={plane.id}
-                    initial={isNew ? { x: 300, opacity: 0, scale: 0.7 } : { opacity: 1 }}
-                    animate={{ x: 0, opacity: 1, scale: 1 }}
-                    exit={{ x: -100, opacity: 0 }}
-                    transition={
-                      isNew
-                        ? { type: 'spring', stiffness: 60, damping: 12, duration: 0.8 }
-                        : { duration: 0.2 }
-                    }
-                    className="card relative overflow-hidden"
-                  >
-                    {/* New indicator */}
-                    {isNew && (
-                      <motion.div
-                        className="absolute top-4 right-4 new-indicator"
-                        initial={{ scale: 1.5 }}
-                        animate={{ scale: 1 }}
-                        transition={{ duration: 0.5 }}
-                      />
-                    )}
-
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="fids-font text-[10px] font-bold tracking-wider">{plane.id.slice(-5).toUpperCase()}</span>
-                        <span className="fids-font text-[10px]" style={{ color: 'var(--ink-muted)' }}>
-                          {new Date(plane.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                      <span className="text-[10px]" style={{ color: 'var(--ink-muted)' }}>
-                        {plane.senderName || 'Anonymous'}
-                      </span>
-                    </div>
-
-                    <p className="text-sm mb-4 leading-relaxed">{plane.content}</p>
-
-                    <div className="flex items-center gap-1.5">
-                      <button
-                        onClick={() =>
-                          plane.isBroadcasted
-                            ? unbroadcastMutation.mutate({ planeId: plane.id })
-                            : broadcastMutation.mutate({ planeId: plane.id })
-                        }
-                        className={`btn-atc-broadcast ${plane.isBroadcasted ? 'active' : ''}`}
-                        title={plane.isBroadcasted ? 'Revoke broadcast' : 'Broadcast'}
-                      >
-                        <BroadcastIcon />
-                        <span>{plane.isBroadcasted ? 'On Air' : 'Broadcast'}</span>
-                      </button>
-                      <button
-                        onClick={() => pinMutation.mutate({ planeId: plane.id })}
-                        className={`btn-atc-hold ${plane.isPinned ? 'active' : ''}`}
-                        title={plane.isPinned ? 'Unpin' : 'Pin'}
-                      >
-                        <PinIcon />
-                        <span>Pin</span>
-                      </button>
-                      <button
-                        onClick={() => removeMutation.mutate({ planeId: plane.id })}
-                        className="btn-atc-reject"
-                        title="Remove"
-                      >
-                        <TrashIcon />
-                        <span>Remove</span>
-                      </button>
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
+        {room && (
+          <div className="flex items-center gap-1.5 text-white/60 text-xs">
+            <UsersIcon />
+            <span>{room.participantCount}</span>
           </div>
         )}
+
+        {/* Plane count */}
+        <div className="flex items-center gap-1.5 text-white/60 text-xs">
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
+          <span>{planes.length} flights</span>
+        </div>
       </div>
+
+      {/* Planes on the tarmac */}
+      <div className="absolute inset-0 z-10" style={{ top: '48px' }}>
+        <AnimatePresence>
+          {planes.map((plane) => {
+            const gateId = gateAssignments.get(plane.id);
+            if (!gateId) return null;
+            const gate = GATES.find((g) => g.id === gateId);
+            if (!gate) return null;
+
+            const isRead = readIds.has(plane.id);
+            const isLanding = landingPlanes.has(plane.id);
+
+            return (
+              <motion.div
+                key={plane.id}
+                className="absolute cursor-pointer"
+                style={{
+                  left: `${gate.x}%`,
+                  top: `${gate.y}%`,
+                  transform: 'translate(-50%, -50%)',
+                  opacity: isRead ? 0.5 : 1,
+                }}
+                initial={isLanding ? { x: '80vw', y: '50%', scale: 1.2, rotate: -90 } : { scale: 1, rotate: 0 }}
+                animate={{ x: 0, y: 0, scale: 1, rotate: 0 }}
+                exit={{ scale: 0, opacity: 0 }}
+                transition={
+                  isLanding
+                    ? { duration: 2.5, ease: [0.25, 0.1, 0.25, 1] }
+                    : { duration: 0.3 }
+                }
+                onClick={() => handlePlaneClick(plane)}
+                whileHover={{ scale: 1.15 }}
+              >
+                {/* Unread glow */}
+                {!isRead && (
+                  <motion.div
+                    className="absolute -top-2 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full"
+                    style={{ background: COLORS.unreadGlow }}
+                    animate={{ scale: [1, 1.4, 1], opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
+                  />
+                )}
+                {/* Plane SVG */}
+                <PlaneTopDown isRead={isRead} size={38} />
+                {/* Flight label */}
+                <div
+                  className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] font-mono font-bold tracking-wider whitespace-nowrap"
+                  style={{ color: isRead ? 'rgba(255,255,255,0.3)' : 'rgba(255,255,255,0.7)' }}
+                >
+                  {plane.id.slice(-4).toUpperCase()}
+                </div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
+      </div>
+
+      {/* Empty state */}
+      {planes.length === 0 && !planesQuery.isLoading && (
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+          <div className="opacity-30">
+            <PlaneTopDown isRead={false} size={80} />
+          </div>
+          <p className="text-white/40 text-sm mt-4 font-mono tracking-wide">
+            Airspace clear -- awaiting arrivals
+          </p>
+          {room && (
+            <p className="text-white/25 text-xs mt-1 font-mono">
+              Share code {room.code} with passengers
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Message Modal */}
+      <AnimatePresence>
+        {selectedPlane && (
+          <MessageModal
+            plane={selectedPlane}
+            onClose={() => setSelectedPlane(null)}
+            onBroadcast={() => {
+              broadcastMutation.mutate({ planeId: selectedPlane.id });
+              setSelectedPlane(null);
+            }}
+            onUnbroadcast={() => {
+              unbroadcastMutation.mutate({ planeId: selectedPlane.id });
+              setSelectedPlane(null);
+            }}
+            onPin={() => {
+              pinMutation.mutate({ planeId: selectedPlane.id });
+              setSelectedPlane(null);
+            }}
+            onRemove={() => {
+              removeMutation.mutate({ planeId: selectedPlane.id });
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }
